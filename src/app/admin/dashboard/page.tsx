@@ -44,7 +44,7 @@ export default async function AdminDashboardPage() {
     redirect("/login");
   }
 
-  let isAdmin = sessionUser?.role === "admin";
+  let isAdmin = sessionUser?.role === "admin" || sessionUser?.role === "superadmin";
   let userRole = sessionUser?.role || "agent";
 
   let adminWorkspaceId = workspace.id;
@@ -56,17 +56,19 @@ export default async function AdminDashboardPage() {
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (user?.id) {
+      const lookupId = user?.id || sessionUser?.id;
+
+      if (lookupId) {
         // First, fetch the current authenticated user's profile:
         const { data: profile } = await supabase
           .from("users")
           .select("workspace_id, role")
-          .eq("id", user.id)
-          .single();
+          .eq("id", lookupId)
+          .maybeSingle();
 
         if (profile?.role) {
           userRole = profile.role;
-          isAdmin = profile.role === "admin";
+          isAdmin = profile.role === "admin" || profile.role === "superadmin";
         }
         if (profile?.workspace_id) {
           adminWorkspaceId = profile.workspace_id;

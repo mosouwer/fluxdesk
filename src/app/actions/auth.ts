@@ -72,17 +72,53 @@ export async function getCurrentSessionUser(): Promise<User | null> {
     };
   }
 
-  // Check live Supabase auth if configured
+  // Check live Supabase database for user record by session ID or email
   if (isLiveSupabaseConfigured) {
     try {
+      const { adminClient, isAdminConfigured } = await import("@/utils/supabase/admin");
+      const client = isAdminConfigured ? adminClient : supabase;
+
+      const { data: dbUser } = await client
+        .from("users")
+        .select("id, full_name, email, avatar_url, role, is_active, workspace_id")
+        .or(`id.eq.${sessionVal},email.eq.${sessionVal}`)
+        .maybeSingle();
+
+      if (dbUser) {
+        if (dbUser.is_active === false) {
+          // User is disabled/suspended
+          return null;
+        }
+        return {
+          id: dbUser.id,
+          name: dbUser.full_name || dbUser.email?.split("@")[0] || "User",
+          email: dbUser.email,
+          avatar: dbUser.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${dbUser.email}`,
+          role: dbUser.role as any,
+          isActive: dbUser.is_active,
+        };
+      }
+
+      // Also check live Supabase auth session if present
       const { data: { user } } = await supabase.auth.getUser();
       if (user?.id) {
+        const { data: authDbUser } = await client
+          .from("users")
+          .select("id, full_name, email, avatar_url, role, is_active")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        const role = authDbUser?.role || user.user_metadata?.role || "customer";
+        if (authDbUser && authDbUser.is_active === false) {
+          return null;
+        }
         return {
           id: user.id,
-          name: user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
+          name: authDbUser?.full_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
           email: user.email || "",
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`,
-          role: "agent",
+          avatar: authDbUser?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`,
+          role: role as any,
+          isActive: authDbUser?.is_active ?? true,
         };
       }
     } catch {

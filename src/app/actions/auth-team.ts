@@ -116,23 +116,30 @@ export async function onboardBrandWithAccount(input: OnboardBrandAccountInput) {
         console.warn("Supabase auth user creation warning:", authEx?.message);
       }
 
+      const dbClient = isAdminConfigured ? adminClient : supabase;
+
       // Insert workspaces record in database
       try {
-        const { error: wsError } = await supabase.from("workspaces").insert({
+        const { error: wsError } = await dbClient.from("workspaces").insert({
           id: workspaceId,
           name: brandName,
           slug,
           public_key: publicKey,
           brand_color: brandColor,
+          status: "active",
+          tier: "standard",
           created_at: now,
           updated_at: now,
         });
 
-        if (wsError && wsError.code === "23505") {
-          return {
-            success: false,
-            error: `Workspace slug "${slug}" is already taken. Please choose another slug.`,
-          };
+        if (wsError) {
+          console.error("Workspace insert error:", wsError);
+          if (wsError.code === "23505") {
+            return {
+              success: false,
+              error: `Workspace slug "${slug}" is already taken. Please choose another slug.`,
+            };
+          }
         }
       } catch (wsEx: any) {
         console.warn("Supabase workspaces insert warning:", wsEx?.message);
@@ -140,18 +147,19 @@ export async function onboardBrandWithAccount(input: OnboardBrandAccountInput) {
 
       // Assign user profile with role: 'admin'
       try {
-        await supabase.from("users").upsert({
+        await dbClient.from("users").upsert({
           id: authUserId,
           email,
           full_name: fullName,
           role: "admin",
           workspace_id: workspaceId,
+          is_active: true,
           avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
           created_at: now,
           updated_at: now,
         });
 
-        await supabase.from("profiles").upsert({
+        await dbClient.from("profiles").upsert({
           id: authUserId,
           email,
           full_name: fullName,
@@ -159,8 +167,29 @@ export async function onboardBrandWithAccount(input: OnboardBrandAccountInput) {
           workspace_id: workspaceId,
           updated_at: now,
         });
-      } catch {
-        // Continue
+
+        await dbClient.from("workspace_members").upsert({
+          workspace_id: workspaceId,
+          user_id: authUserId,
+          role: "admin",
+          is_active: true,
+          created_at: now,
+          updated_at: now,
+        }, { onConflict: "workspace_id,user_id" });
+      } catch (userEx: any) {
+        console.error("Supabase user/member creation error:", userEx);
+      }
+
+      // Automatically sign in the user via Supabase Auth so cookies are set!
+      if (isLiveSupabaseConfigured) {
+        try {
+          await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+        } catch (signInErr) {
+          console.warn("Auto signInWithPassword warning:", signInErr);
+        }
       }
     }
 
@@ -423,16 +452,19 @@ export async function loginUser(
 
       if (!signInError && authData.user) {
         // Fetch role from users table
-        let targetRole: "admin" | "agent" | "customer" = "agent";
+        let targetRole: "superadmin" | "admin" | "agent" | "customer" = "agent";
         try {
-          const { data: userProfile } = await supabase
+          const dbClient = isAdminConfigured ? adminClient : supabase;
+          const { data: userProfile } = await dbClient
             .from("users")
             .select("role")
             .eq("id", authData.user.id)
-            .single();
+            .maybeSingle();
 
           if (userProfile?.role) {
             targetRole = userProfile.role;
+          } else if (authData.user.user_metadata?.role) {
+            targetRole = authData.user.user_metadata.role;
           }
         } catch {
           // Default
@@ -445,7 +477,9 @@ export async function loginUser(
           maxAge: 60 * 60 * 24 * 7,
         });
 
-        if (targetRole === "admin") {
+        if (targetRole === "superadmin") {
+          redirect("/super");
+        } else if (targetRole === "admin") {
           redirect("/admin/dashboard");
         } else if (targetRole === "customer") {
           redirect("/portal");

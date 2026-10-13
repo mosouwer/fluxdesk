@@ -37,7 +37,7 @@ export default async function AdminSettingsPage() {
     redirect("/login");
   }
 
-  let isAdmin = sessionUser?.role === "admin";
+  let isAdmin = sessionUser?.role === "admin" || sessionUser?.role === "superadmin";
   let userRole = sessionUser?.role || "agent";
 
   if (isLiveSupabaseConfigured && supabase) {
@@ -46,16 +46,18 @@ export default async function AdminSettingsPage() {
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (user?.id) {
+      const lookupId = user?.id || sessionUser?.id;
+
+      if (lookupId) {
         const { data: userRecord } = await supabase
           .from("users")
           .select("role")
-          .eq("id", user.id)
-          .single();
+          .eq("id", lookupId)
+          .maybeSingle();
 
         if (userRecord?.role) {
           userRole = userRecord.role;
-          isAdmin = userRecord.role === "admin";
+          isAdmin = userRecord.role === "admin" || userRecord.role === "superadmin";
         }
       }
     } catch {
