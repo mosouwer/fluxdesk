@@ -40,3 +40,4 @@ Thumbs.db
 # TypeScript declaration cache
 *.tsbuildinfo
 next-env.d.ts
+.env*

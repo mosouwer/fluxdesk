@@ -163,7 +163,6 @@ export async function onboardBrandWithAccount(input: OnboardBrandAccountInput) {
           id: authUserId,
           email,
           full_name: fullName,
-          role: "admin",
           workspace_id: workspaceId,
           updated_at: now,
         });
@@ -323,7 +322,8 @@ export async function createBrandUser(input: CreateBrandUserInput) {
     // Insert user record in public.users tied to current admin's workspace_id
     if (isLiveSupabaseConfigured || isAdminConfigured) {
       try {
-        await supabase.from("users").upsert({
+        const dbClient = isAdminConfigured ? adminClient : supabase;
+        await dbClient.from("users").upsert({
           id: authUserId,
           email,
           full_name: fullName,
@@ -334,22 +334,21 @@ export async function createBrandUser(input: CreateBrandUserInput) {
           updated_at: now,
         });
 
-        await supabase.from("profiles").upsert({
+        await dbClient.from("profiles").upsert({
           id: authUserId,
           email,
           full_name: fullName,
-          role,
           workspace_id: targetWorkspaceId,
           avatar_url: avatarUrl,
           updated_at: now,
         });
 
-        await supabase.from("workspace_members").upsert({
+        await dbClient.from("workspace_members").upsert({
           workspace_id: targetWorkspaceId,
           user_id: authUserId,
           role,
           is_active: true,
-        });
+        }, { onConflict: "workspace_id,user_id" });
       } catch (dbErr: any) {
         console.warn("Database user insert warning:", dbErr?.message);
       }
