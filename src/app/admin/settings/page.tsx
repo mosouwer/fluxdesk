@@ -40,20 +40,27 @@ export default async function AdminSettingsPage() {
   let isAdmin = sessionUser?.role === "admin" || sessionUser?.role === "superadmin";
   let userRole = sessionUser?.role || "agent";
 
-  if (isLiveSupabaseConfigured && supabase) {
+  if (isLiveSupabaseConfigured) {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { adminClient, isAdminConfigured } = await import("@/utils/supabase/admin");
+      const client = isAdminConfigured ? adminClient : (supabase || await createClient());
 
-      const lookupId = user?.id || sessionUser?.id;
+      const lookupId = sessionUser?.id;
 
       if (lookupId) {
-        const { data: userRecord } = await supabase
-          .from("users")
-          .select("role")
-          .eq("id", lookupId)
-          .maybeSingle();
+        const isUuid = (val: string) =>
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+
+        let userQuery = client.from("users").select("role");
+        if (isUuid(lookupId)) {
+          userQuery = userQuery.eq("id", lookupId);
+        } else if (lookupId.includes("@")) {
+          userQuery = userQuery.eq("email", lookupId.toLowerCase());
+        } else {
+          userQuery = userQuery.eq("id", lookupId);
+        }
+
+        const { data: userRecord } = await userQuery.maybeSingle();
 
         if (userRecord?.role) {
           userRole = userRecord.role;

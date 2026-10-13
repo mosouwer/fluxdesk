@@ -51,20 +51,25 @@ export default async function AdminDashboardPage() {
 
   if (isLiveSupabaseConfigured) {
     try {
-      const supabase = await createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { adminClient, isAdminConfigured } = await import("@/utils/supabase/admin");
+      const client = isAdminConfigured ? adminClient : await createClient();
 
-      const lookupId = user?.id || sessionUser?.id;
+      const lookupId = sessionUser?.id;
 
       if (lookupId) {
-        // First, fetch the current authenticated user's profile:
-        const { data: profile } = await supabase
-          .from("users")
-          .select("workspace_id, role")
-          .eq("id", lookupId)
-          .maybeSingle();
+        const isUuid = (val: string) =>
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+
+        let userQuery = client.from("users").select("workspace_id, role");
+        if (isUuid(lookupId)) {
+          userQuery = userQuery.eq("id", lookupId);
+        } else if (lookupId.includes("@")) {
+          userQuery = userQuery.eq("email", lookupId.toLowerCase());
+        } else {
+          userQuery = userQuery.eq("id", lookupId);
+        }
+
+        const { data: profile } = await userQuery.maybeSingle();
 
         if (profile?.role) {
           userRole = profile.role;
@@ -72,6 +77,16 @@ export default async function AdminDashboardPage() {
         }
         if (profile?.workspace_id) {
           adminWorkspaceId = profile.workspace_id;
+        } else {
+          const { data: latestWs } = await client
+            .from("workspaces")
+            .select("id")
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (latestWs?.id) {
+            adminWorkspaceId = latestWs.id;
+          }
         }
       }
     } catch {
@@ -115,8 +130,9 @@ export default async function AdminDashboardPage() {
   let tickets: Ticket[] = [];
   if (isLiveSupabaseConfigured && adminWorkspaceId) {
     try {
-      const supabase = await createClient();
-      const { data: dbTickets, error } = await supabase
+      const { adminClient, isAdminConfigured } = await import("@/utils/supabase/admin");
+      const queryClient = isAdminConfigured ? adminClient : await createClient();
+      const { data: dbTickets, error } = await queryClient
         .from("tickets")
         .select(`
           *,

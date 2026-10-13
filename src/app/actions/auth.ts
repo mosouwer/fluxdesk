@@ -78,11 +78,22 @@ export async function getCurrentSessionUser(): Promise<User | null> {
       const { adminClient, isAdminConfigured } = await import("@/utils/supabase/admin");
       const client = isAdminConfigured ? adminClient : supabase;
 
-      const { data: dbUser } = await client
+      const isUuid = (val: string) =>
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+
+      let userQuery = client
         .from("users")
-        .select("id, full_name, email, avatar_url, role, is_active, workspace_id")
-        .or(`id.eq.${sessionVal},email.eq.${sessionVal}`)
-        .maybeSingle();
+        .select("id, full_name, email, avatar_url, role, is_active, workspace_id");
+
+      if (isUuid(sessionVal)) {
+        userQuery = userQuery.eq("id", sessionVal);
+      } else if (sessionVal.includes("@")) {
+        userQuery = userQuery.eq("email", sessionVal.toLowerCase());
+      } else {
+        userQuery = userQuery.eq("id", sessionVal);
+      }
+
+      const { data: dbUser } = await userQuery.maybeSingle();
 
       if (dbUser) {
         if (dbUser.is_active === false) {

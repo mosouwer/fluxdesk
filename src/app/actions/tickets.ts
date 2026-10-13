@@ -661,8 +661,9 @@ export async function getAgentTickets(workspaceId?: string): Promise<Ticket[]> {
   }
 
   try {
-    const supabase = await createClient();
-    let query = supabase
+    const { adminClient, isAdminConfigured } = await import("@/utils/supabase/admin");
+    const queryClient = isAdminConfigured ? adminClient : await createClient();
+    let query = queryClient
       .from("tickets")
       .select(`
         *,
