@@ -282,8 +282,13 @@ export async function createBrandUser(input: CreateBrandUserInput) {
       return { success: false, error: "Full name is required." };
     }
 
+    const sessionUser = await getCurrentSessionUser();
     const activeWorkspace = getActiveWorkspace();
-    const targetWorkspaceId = activeWorkspace.id;
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const targetWorkspaceId =
+      (sessionUser?.workspace_id && UUID_REGEX.test(sessionUser.workspace_id))
+        ? sessionUser.workspace_id
+        : activeWorkspace.id;
     const now = new Date().toISOString();
     let authUserId = `u-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`;

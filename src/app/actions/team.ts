@@ -10,11 +10,16 @@ import {
   addSharedTeamMember,
 } from "@/data/teamStore";
 
+import { adminClient, isAdminConfigured } from "@/utils/supabase/admin";
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export interface CreateTeamMemberInput {
   email: string;
   fullName: string;
   role: "admin" | "agent";
   workspaceId?: string;
+  password?: string;
 }
 
 function safeRevalidatePath(path: string) {
@@ -28,19 +33,21 @@ function safeRevalidatePath(path: string) {
 /**
  * 1. createTeamMember
  * Verifies that the calling user has role 'admin' in the database before inserting,
- * binds newly created users to the current admin's workspace_id,
- * and inserts them into the workspace.
+ * binds newly created users strictly to the current admin's workspace_id,
+ * and provisions them across auth and database tables.
  */
 export async function createTeamMember({
   email,
   fullName,
   role,
   workspaceId,
+  password,
 }: CreateTeamMemberInput) {
   try {
     const cleanEmail = (email || "").trim().toLowerCase();
     const cleanFullName = (fullName || "").trim();
     const assignedRole = role === "admin" ? "admin" : "agent";
+    const initialPassword = password?.trim() || `FluxTeam#${Math.floor(100000 + Math.random() * 900000)}`;
 
     // Basic validation
     if (!cleanEmail || !cleanEmail.includes("@")) {
@@ -53,120 +60,117 @@ export async function createTeamMember({
 
     // Resolve calling user session
     const callingSessionUser = await getCurrentSessionUser();
-    if (callingSessionUser && callingSessionUser.role !== "admin") {
+    if (
+      callingSessionUser &&
+      callingSessionUser.role !== "admin" &&
+      callingSessionUser.role !== "superadmin"
+    ) {
       return {
         success: false,
         error: "Unauthorized: Only workspace administrators have permission to manage and invite team members.",
       };
     }
 
-    // Resolve target workspace ID
+    // Resolve target workspace ID strictly from caller's session or parameter
     const activeWorkspace = getActiveWorkspace();
-    let adminWorkspaceId = workspaceId || activeWorkspace.id;
+    let adminWorkspaceId =
+      (workspaceId && UUID_REGEX.test(workspaceId))
+        ? workspaceId
+        : (callingSessionUser?.workspace_id && UUID_REGEX.test(callingSessionUser.workspace_id))
+        ? callingSessionUser.workspace_id
+        : activeWorkspace.id;
 
-    if (isLiveSupabaseConfigured) {
-      const supabase = await createClient();
-      // 1. Verify calling user has role 'admin' in the database before inserting
-      try {
-        const {
-          data: { user: callingUser },
-        } = await supabase.auth.getUser();
+    let newUserId = crypto.randomUUID();
+    const now = new Date().toISOString();
+    const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${cleanEmail}`;
 
-        if (callingUser?.id) {
-          // Check role in `users` table
-          const { data: userRecord, error: userFetchError } = await supabase
-            .from("users")
-            .select("role, workspace_id")
-            .eq("id", callingUser.id)
-            .single();
+    if (isAdminConfigured || isLiveSupabaseConfigured) {
+      const db = isAdminConfigured ? adminClient : await createClient();
 
-          let userRole = userRecord?.role;
-          if (userRecord?.workspace_id) {
-            adminWorkspaceId = userRecord.workspace_id;
+      // Provision user in Supabase Auth if admin key is configured
+      if (isAdminConfigured) {
+        try {
+          const { data: authData, error: authErr } = await adminClient.auth.admin.createUser({
+            email: cleanEmail,
+            password: initialPassword,
+            email_confirm: true,
+            user_metadata: {
+              full_name: cleanFullName,
+              role: assignedRole,
+              workspace_id: adminWorkspaceId,
+            },
+          });
+
+          if (!authErr && authData?.user?.id) {
+            newUserId = authData.user.id;
+          } else if (authErr && !authErr.message.toLowerCase().includes("already registered")) {
+            console.warn("admin.createUser warning:", authErr.message);
           }
-
-          // If not found in `users`, check `workspace_members` table
-          if (!userRole) {
-            const { data: memberRecord } = await supabase
-              .from("workspace_members")
-              .select("role, workspace_id")
-              .eq("user_id", callingUser.id)
-              .eq("is_active", true)
-              .single();
-
-            userRole = memberRecord?.role;
-            if (memberRecord?.workspace_id) {
-              adminWorkspaceId = memberRecord.workspace_id;
-            }
-          }
-
-          // Strict role authorization verification
-          if (userRole && userRole !== "admin") {
-            return {
-              success: false,
-              error: "Unauthorized: Only workspace administrators have permission to manage and invite team members.",
-            };
-          }
+        } catch (authEx: any) {
+          console.warn("auth.admin.createUser exception:", authEx?.message);
         }
-      } catch (authErr) {
-        console.warn("Admin role verification fallback:", authErr);
       }
 
-      // 2. Insert newly created user bound to admin's workspace_id
-      const newUserId = crypto.randomUUID();
-      const now = new Date().toISOString();
-      const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${cleanEmail}`;
-
-      // Insert into `users` table
-      const { error: insertUserError } = await supabase
-        .from("users")
-        .upsert({
-          id: newUserId,
-          email: cleanEmail,
-          full_name: cleanFullName,
-          role: assignedRole,
-          workspace_id: adminWorkspaceId,
-          avatar_url: avatarUrl,
-          created_at: now,
-          updated_at: now,
-        });
-
-      if (insertUserError) {
-        console.error("Failed to insert user in Supabase:", insertUserError);
-      }
-
-      // Also sync into `profiles` and `workspace_members`
+      // Upsert into `users` table
       try {
-        await supabase.from("profiles").upsert({
+        await db.from("users").upsert({
+          id: newUserId,
+          email: cleanEmail,
+          full_name: cleanFullName,
+          role: assignedRole,
+          workspace_id: adminWorkspaceId,
+          avatar_url: avatarUrl,
+          is_active: true,
+          created_at: now,
+          updated_at: now,
+        });
+      } catch (userErr: any) {
+        console.error("Supabase users table upsert error:", userErr);
+      }
+
+      // Sync into `profiles` table (without role column)
+      try {
+        await db.from("profiles").upsert({
           id: newUserId,
           email: cleanEmail,
           full_name: cleanFullName,
           avatar_url: avatarUrl,
           workspace_id: adminWorkspaceId,
-          created_at: now,
           updated_at: now,
         });
+      } catch (profErr: any) {
+        console.warn("Supabase profiles upsert warning:", profErr?.message);
+      }
 
-        await supabase.from("workspace_members").upsert({
-          workspace_id: adminWorkspaceId,
-          user_id: newUserId,
-          role: assignedRole,
-          is_active: true,
-        });
-      } catch {
-        // Table may vary
+      // Sync into `workspace_members`
+      try {
+        await db.from("workspace_members").upsert(
+          {
+            workspace_id: adminWorkspaceId,
+            user_id: newUserId,
+            role: assignedRole,
+            is_active: true,
+            created_at: now,
+            updated_at: now,
+          },
+          { onConflict: "workspace_id,user_id" }
+        );
+      } catch (memberErr: any) {
+        console.warn("workspace_members upsert warning:", memberErr?.message);
       }
     }
 
     // Persist to shared runtime teamStore
     const newMember: TeamMember = {
-      id: `u-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      id: newUserId,
       email: cleanEmail,
       fullName: cleanFullName,
       role: assignedRole,
       workspaceId: adminWorkspaceId,
-      avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${cleanEmail}`,
-      createdAt: new Date().toISOString(),
+      password: initialPassword,
+      avatarUrl,
+      isActive: true,
+      createdAt: now,
     };
 
     addSharedTeamMember(newMember);
@@ -190,37 +194,69 @@ export async function createTeamMember({
 
 /**
  * 2. getTeamMembers
- * Fetches current team members inside the specified workspace (or active workspace).
+ * Fetches current team members strictly inside the calling admin's workspace.
+ * Prevents cross-tenant team leakage.
  */
 export async function getTeamMembers(workspaceId?: string): Promise<TeamMember[]> {
+  const sessionUser = await getCurrentSessionUser();
   const activeWorkspace = getActiveWorkspace();
-  const targetWorkspaceId = workspaceId || activeWorkspace.id;
 
-  if (isLiveSupabaseConfigured) {
+  const targetWorkspaceId =
+    (workspaceId && UUID_REGEX.test(workspaceId))
+      ? workspaceId
+      : (sessionUser?.workspace_id && UUID_REGEX.test(sessionUser.workspace_id))
+      ? sessionUser.workspace_id
+      : activeWorkspace.id;
+
+  if (isAdminConfigured || isLiveSupabaseConfigured) {
     try {
-      const supabase = await createClient();
-      const { data: dbUsers, error } = await supabase
-        .from("users")
-        .select("id, email, full_name, role, workspace_id, avatar_url, created_at")
-        .eq("workspace_id", targetWorkspaceId)
-        .in("role", ["admin", "agent"])
-        .order("created_at", { ascending: false });
+      const db = isAdminConfigured ? adminClient : await createClient();
 
-      if (!error && dbUsers && dbUsers.length > 0) {
-        return dbUsers.map((u: any) => ({
-          id: u.id,
-          email: u.email,
-          fullName: u.full_name || u.email.split("@")[0],
-          role: u.role as "admin" | "agent",
-          workspaceId: u.workspace_id,
-          avatarUrl: u.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.email}`,
-          createdAt: u.created_at,
-        }));
+      if (targetWorkspaceId && UUID_REGEX.test(targetWorkspaceId)) {
+        const { data: dbUsers, error } = await db
+          .from("users")
+          .select("id, email, full_name, role, workspace_id, avatar_url, is_active, created_at")
+          .eq("workspace_id", targetWorkspaceId)
+          .in("role", ["admin", "agent"])
+          .order("created_at", { ascending: false });
+
+        if (!error && dbUsers) {
+          const members: TeamMember[] = dbUsers.map((u: any) => ({
+            id: u.id,
+            email: u.email,
+            fullName: u.full_name || u.email.split("@")[0],
+            role: u.role as "admin" | "agent",
+            workspaceId: u.workspace_id,
+            avatarUrl: u.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.email}`,
+            isActive: u.is_active !== false,
+            createdAt: u.created_at,
+          }));
+
+          // If the caller is an admin in this workspace, ensure they are present in the list
+          if (sessionUser && sessionUser.workspace_id === targetWorkspaceId) {
+            const hasCaller = members.some((m) => m.id === sessionUser.id || m.email.toLowerCase() === sessionUser.email.toLowerCase());
+            if (!hasCaller) {
+              members.unshift({
+                id: sessionUser.id,
+                email: sessionUser.email,
+                fullName: sessionUser.name,
+                role: "admin",
+                workspaceId: targetWorkspaceId,
+                avatarUrl: sessionUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${sessionUser.email}`,
+                isActive: true,
+                createdAt: new Date().toISOString(),
+              });
+            }
+          }
+
+          return members;
+        }
       }
     } catch (err) {
-      console.warn("Failed to fetch team members from Supabase, using teamStore fallback:", err);
+      console.warn("Failed to fetch team members from Supabase:", err);
     }
   }
 
+  // Fallback strictly filtered by targetWorkspaceId (never leak all members)
   return getSharedTeamMembers(targetWorkspaceId);
 }

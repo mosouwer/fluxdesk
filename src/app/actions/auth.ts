@@ -62,6 +62,7 @@ export async function getCurrentSessionUser(): Promise<User | null> {
       // User is disabled/suspended by Super Admin
       return null;
     }
+    const wsId = "workspaceId" in found ? found.workspaceId : undefined;
     return {
       id: found.id,
       name: "name" in found ? found.name : found.fullName,
@@ -69,6 +70,8 @@ export async function getCurrentSessionUser(): Promise<User | null> {
       avatar: "avatar" in found ? found.avatar : found.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${found.email}`,
       role: found.role,
       isActive: "isActive" in found ? found.isActive : true,
+      workspaceId: wsId,
+      workspace_id: wsId,
     };
   }
 
@@ -107,6 +110,8 @@ export async function getCurrentSessionUser(): Promise<User | null> {
           avatar: dbUser.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${dbUser.email}`,
           role: dbUser.role as any,
           isActive: dbUser.is_active,
+          workspaceId: dbUser.workspace_id,
+          workspace_id: dbUser.workspace_id,
         };
       }
 
@@ -115,7 +120,7 @@ export async function getCurrentSessionUser(): Promise<User | null> {
       if (user?.id) {
         const { data: authDbUser } = await client
           .from("users")
-          .select("id, full_name, email, avatar_url, role, is_active")
+          .select("id, full_name, email, avatar_url, role, is_active, workspace_id")
           .eq("id", user.id)
           .maybeSingle();
 
@@ -123,6 +128,7 @@ export async function getCurrentSessionUser(): Promise<User | null> {
         if (authDbUser && authDbUser.is_active === false) {
           return null;
         }
+        const wsId = authDbUser?.workspace_id || user.user_metadata?.workspace_id;
         return {
           id: user.id,
           name: authDbUser?.full_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
@@ -130,6 +136,8 @@ export async function getCurrentSessionUser(): Promise<User | null> {
           avatar: authDbUser?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`,
           role: role as any,
           isActive: authDbUser?.is_active ?? true,
+          workspaceId: wsId,
+          workspace_id: wsId,
         };
       }
     } catch {

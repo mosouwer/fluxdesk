@@ -18,7 +18,7 @@ export interface Workspace {
 }
 
 export const INITIAL_WORKSPACE: Workspace = {
-  id: "w0000000-0000-0000-0000-000000000001",
+  id: "5c03df0f-591e-463c-8dd5-e64e6055af2a",
   name: "Acme Cloud Technologies",
   slug: "acme-support",
   publicKey: "pk_live_acme_cloud_tech",

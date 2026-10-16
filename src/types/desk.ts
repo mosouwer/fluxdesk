@@ -8,6 +8,7 @@ export interface User {
   role: UserRole;
   isActive?: boolean;
   workspaceId?: string;
+  workspace_id?: string;
   workspaceName?: string;
   company?: string;
   timezone?: string;

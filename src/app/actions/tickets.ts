@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { serverSupabase as supabase, createClient, isLiveSupabaseConfigured } from "@/utils/supabase/server";
+import { adminClient, isAdminConfigured } from "@/utils/supabase/admin";
+import { getCurrentSessionUser } from "@/app/actions/auth";
 import { Ticket, TicketMessage, TicketStatus, TicketPriority, TicketChannel, MessageType } from "@/types/desk";
 import { INITIAL_TICKETS, CURRENT_AGENT, CUSTOMER_EMILY } from "@/data/mockDeskData";
 import {
@@ -9,6 +11,8 @@ import {
   addSharedTicket,
   updateSharedTicketsList,
 } from "@/data/ticketStore";
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function safeRevalidatePath(path: string) {
   try {
@@ -66,33 +70,36 @@ export async function submitNewTicket(formData: FormData) {
       }
     }
 
-    // Determine target workspace (formData workspace_id or active workspace)
+    // Determine target workspace (formData workspace_id or user session or active workspace)
     const formWorkspaceId = ((formData.get("workspace_id") as string) || (formData.get("workspaceId") as string) || "").trim();
+    const sessionUser = await getCurrentSessionUser();
     const { getActiveWorkspace } = await import("@/data/workspaceStore");
     const activeWs = getActiveWorkspace();
-    let workspaceId = formWorkspaceId || activeWs.id || "w0000000-0000-0000-0000-000000000001";
 
-    if (isLiveSupabaseConfigured && !formWorkspaceId) {
+    let workspaceId =
+      (formWorkspaceId && UUID_REGEX.test(formWorkspaceId))
+        ? formWorkspaceId
+        : (sessionUser?.workspace_id && UUID_REGEX.test(sessionUser.workspace_id))
+        ? sessionUser.workspace_id
+        : activeWs.id;
+
+    const db = isAdminConfigured ? adminClient : supabase;
+
+    // Check if workspaceId is valid UUID; if not, query live workspaces
+    if ((!workspaceId || !UUID_REGEX.test(workspaceId)) && (isAdminConfigured || isLiveSupabaseConfigured)) {
       try {
-        const { data: wsData } = await supabase
-          .from("workspaces")
-          .select("id")
-          .limit(1)
-          .maybeSingle();
+        const { data: wsData } = await db.from("workspaces").select("id").limit(1).maybeSingle();
         if (wsData?.id) {
           workspaceId = wsData.id;
         }
       } catch {
-        // Use active workspace
+        // Fallback
       }
     }
 
-    // Determine customer profile id
-    let customerId = `u-cust-${Date.now()}`;
-    const { adminClient, isAdminConfigured } = await import("@/utils/supabase/admin");
-    const db = isAdminConfigured ? adminClient : supabase;
-
-    if (isLiveSupabaseConfigured) {
+    // Determine customer profile id safely (only UUID if exists in profiles)
+    let customerId: string | null = null;
+    if (isLiveSupabaseConfigured || isAdminConfigured) {
       try {
         const { data: profileData } = await db
           .from("profiles")
@@ -100,24 +107,8 @@ export async function submitNewTicket(formData: FormData) {
           .eq("email", customerEmail)
           .maybeSingle();
 
-        if (profileData?.id) {
+        if (profileData?.id && UUID_REGEX.test(profileData.id)) {
           customerId = profileData.id;
-        } else {
-          // Create customer profile
-          const { data: newProfile } = await db
-            .from("profiles")
-            .insert({
-              email: customerEmail,
-              full_name: customerName,
-              phone: customerPhone,
-              workspace_id: workspaceId,
-            })
-            .select("id")
-            .maybeSingle();
-
-          if (newProfile?.id) {
-            customerId = newProfile.id;
-          }
         }
       } catch (profErr) {
         console.warn("Profile resolution fallback:", profErr);
@@ -137,7 +128,7 @@ export async function submitNewTicket(formData: FormData) {
     let insertedTicket: any = null;
 
     // Database insertion into 'tickets'
-    if (isLiveSupabaseConfigured) {
+    if (isLiveSupabaseConfigured || isAdminConfigured) {
       try {
         const { data: ticketData, error: ticketError } = await db
           .from("tickets")
@@ -159,7 +150,12 @@ export async function submitNewTicket(formData: FormData) {
           .select()
           .single();
 
-        if (!ticketError && ticketData) {
+        if (ticketError) {
+          console.error("Database ticket insert error:", ticketError.message);
+          return { success: false, error: ticketError.message };
+        }
+
+        if (ticketData) {
           insertedTicket = ticketData;
 
           // Create initial message in 'ticket_messages'
@@ -171,11 +167,10 @@ export async function submitNewTicket(formData: FormData) {
             body: description,
             attachments: attachmentsList,
           });
-        } else if (ticketError) {
-          console.warn("Database insert warning:", ticketError.message);
         }
-      } catch (dbErr) {
-        console.warn("Supabase database insert fallback:", dbErr);
+      } catch (dbErr: any) {
+        console.error("Supabase database insert exception:", dbErr);
+        return { success: false, error: dbErr?.message || "Failed to save ticket" };
       }
     }
 
@@ -194,7 +189,7 @@ export async function submitNewTicket(formData: FormData) {
       channel: "web",
       workspaceId: workspaceId,
       customer: {
-        id: customerId,
+        id: customerId || `cust-${Date.now()}`,
         name: customerName,
         email: customerEmail,
         phone: customerPhone,
@@ -210,7 +205,7 @@ export async function submitNewTicket(formData: FormData) {
           id: `m-init-${Date.now()}`,
           ticketId: insertedTicket?.id || `t-${Date.now()}`,
           sender: {
-            id: customerId,
+            id: customerId || `cust-${Date.now()}`,
             name: customerName,
             email: customerEmail,
             avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(customerName)}`,
@@ -288,77 +283,64 @@ export async function createAgentTicket(input: CreateAgentTicketInput) {
     }
     const cleanCustomerName = customerName?.trim() || customerEmail.split("@")[0] || "Customer";
 
-    // Resolve workspace ID & current agent profile
-    let targetWorkspaceId = workspaceId;
-    let currentUserProfile: any = null;
+    const cleanCustomerEmail = customerEmail.trim().toLowerCase();
 
-    if (isLiveSupabaseConfigured) {
+    // Resolve caller session & workspace ID
+    const sessionUser = await getCurrentSessionUser();
+    const { getActiveWorkspace } = await import("@/data/workspaceStore");
+    const activeWs = getActiveWorkspace();
+
+    let targetWorkspaceId =
+      (workspaceId && UUID_REGEX.test(workspaceId))
+        ? workspaceId
+        : (sessionUser?.workspace_id && UUID_REGEX.test(sessionUser.workspace_id))
+        ? sessionUser.workspace_id
+        : activeWs.id;
+
+    const db = isAdminConfigured ? adminClient : supabase;
+
+    if ((!targetWorkspaceId || !UUID_REGEX.test(targetWorkspaceId)) && (isAdminConfigured || isLiveSupabaseConfigured)) {
       try {
-        const client = await createClient();
-        const {
-          data: { user },
-        } = await client.auth.getUser();
-
-        if (user) {
-          const { data: profile } = await client
-            .from("users")
-            .select("id, workspace_id, role, full_name, email")
-            .eq("id", user.id)
-            .maybeSingle();
-
-          if (profile) {
-            currentUserProfile = profile;
-            if (!targetWorkspaceId && profile.workspace_id) {
-              targetWorkspaceId = profile.workspace_id;
-            }
-          }
+        const { data: wsData } = await db.from("workspaces").select("id").limit(1).maybeSingle();
+        if (wsData?.id) {
+          targetWorkspaceId = wsData.id;
         }
-      } catch (authErr) {
-        console.warn("Could not retrieve current user profile for ticket creation:", authErr);
+      } catch {
+        // Fallback
       }
     }
 
-    if (!targetWorkspaceId) {
-      const { getActiveWorkspace } = await import("@/data/workspaceStore");
-      targetWorkspaceId = getActiveWorkspace().id;
-    }
-
     let insertedTicket: any = null;
-    let customerId = currentUserProfile?.id || "u0000000-0000-0000-0000-000000000004";
+    let customerId: string | null = null;
+    let agentId: string | null = null;
 
-    if (isLiveSupabaseConfigured) {
+    if (isLiveSupabaseConfigured || isAdminConfigured) {
       try {
-        const client = await createClient();
-
-        // Check for customer profile by email
-        const { data: profileData } = await client
+        // Check for customer profile by email (must exist in profiles with valid UUID)
+        const { data: profileData } = await db
           .from("profiles")
           .select("id")
-          .eq("email", customerEmail.trim())
+          .eq("email", cleanCustomerEmail)
           .maybeSingle();
 
-        if (profileData?.id) {
+        if (profileData?.id && UUID_REGEX.test(profileData.id)) {
           customerId = profileData.id;
-        } else {
-          // Attempt inserting a new profile for the customer
-          const { data: newProfile } = await client
-            .from("profiles")
-            .insert({
-              email: customerEmail.trim(),
-              full_name: cleanCustomerName,
-              phone: customerPhone?.trim() || null,
-            })
-            .select("id")
-            .maybeSingle();
+        }
 
-          if (newProfile?.id) {
-            customerId = newProfile.id;
+        // Validate agent ID
+        const candidateAgentId = assignedAgentId || sessionUser?.id;
+        if (candidateAgentId && UUID_REGEX.test(candidateAgentId)) {
+          const { data: agentProf } = await db
+            .from("profiles")
+            .select("id")
+            .eq("id", candidateAgentId)
+            .maybeSingle();
+          if (agentProf?.id) {
+            agentId = agentProf.id;
           }
         }
 
-        const agentId = assignedAgentId || currentUserProfile?.id || null;
-
-        const { data: ticketData, error: ticketError } = await client
+        const { data: ticketData, error: ticketError } = await db
           .from("tickets")
           .insert({
             workspace_id: targetWorkspaceId,
@@ -372,31 +354,35 @@ export async function createAgentTicket(input: CreateAgentTicketInput) {
             tags: tags.length > 0 ? tags : ["agent-created"],
             metadata: {
               customer_name: cleanCustomerName,
-              customer_email: customerEmail.trim(),
+              customer_email: cleanCustomerEmail,
               customer_phone: customerPhone?.trim() || null,
-              created_by: currentUserProfile?.email || "agent",
+              created_by: sessionUser?.email || "agent",
             },
           })
           .select()
           .single();
 
-        if (!ticketError && ticketData) {
+        if (ticketError) {
+          console.error("Supabase ticket insert error:", ticketError);
+          return { success: false, error: ticketError.message };
+        }
+
+        if (ticketData) {
           insertedTicket = ticketData;
 
           // Insert initial message in ticket_messages
-          await client.from("ticket_messages").insert({
+          await db.from("ticket_messages").insert({
             workspace_id: targetWorkspaceId,
             ticket_id: ticketData.id,
-            sender_id: currentUserProfile?.id || customerId,
+            sender_id: agentId || customerId || null,
             type: "public_reply",
             body: description.trim(),
             attachments: [],
           });
-        } else if (ticketError) {
-          console.warn("Supabase ticket insert error:", ticketError);
         }
-      } catch (dbErr) {
-        console.warn("Supabase ticket creation exception:", dbErr);
+      } catch (dbErr: any) {
+        console.error("Supabase ticket creation exception:", dbErr);
+        return { success: false, error: dbErr?.message || "Failed to create ticket" };
       }
     }
 
@@ -415,7 +401,7 @@ export async function createAgentTicket(input: CreateAgentTicketInput) {
       channel: (channel as TicketChannel) || "email",
       workspaceId: targetWorkspaceId,
       customer: {
-        id: customerId,
+        id: customerId || `cust-${Date.now()}`,
         name: cleanCustomerName,
         email: customerEmail.trim(),
         phone: customerPhone?.trim(),
@@ -430,13 +416,13 @@ export async function createAgentTicket(input: CreateAgentTicketInput) {
             avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
             role: "agent",
           }
-        : currentUserProfile
+        : sessionUser
         ? {
-            id: currentUserProfile.id,
-            name: currentUserProfile.full_name || "Staff Agent",
-            email: currentUserProfile.email || "",
-            avatar: currentUserProfile.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-            role: currentUserProfile.role || "agent",
+            id: sessionUser.id,
+            name: sessionUser.name || "Staff Agent",
+            email: sessionUser.email || "",
+            avatar: sessionUser.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+            role: sessionUser.role || "agent",
           }
         : undefined,
       tags: tags.length > 0 ? tags : ["agent-created"],
@@ -448,7 +434,7 @@ export async function createAgentTicket(input: CreateAgentTicketInput) {
           id: `m-init-${Date.now()}`,
           ticketId: insertedTicket?.id || `t-${Date.now()}`,
           sender: {
-            id: customerId,
+            id: customerId || `cust-${Date.now()}`,
             name: cleanCustomerName,
             email: customerEmail.trim(),
             avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cleanCustomerName)}`,
@@ -651,17 +637,22 @@ export async function updateTicketStatus({
  * Fetches tickets with customer, agent, and messages scoped strictly to workspaceId.
  */
 export async function getAgentTickets(workspaceId?: string): Promise<Ticket[]> {
+  const sessionUser = await getCurrentSessionUser();
   const activeWorkspace = (await import("@/data/workspaceStore")).getActiveWorkspace();
-  const targetWorkspaceId = workspaceId || activeWorkspace.id;
+  const targetWorkspaceId =
+    (workspaceId && UUID_REGEX.test(workspaceId))
+      ? workspaceId
+      : (sessionUser?.workspace_id && UUID_REGEX.test(sessionUser.workspace_id))
+      ? sessionUser.workspace_id
+      : activeWorkspace.id;
 
-  if (!isLiveSupabaseConfigured) {
+  if (!isLiveSupabaseConfigured && !isAdminConfigured) {
     const allShared = getSharedTickets();
     // Only return tickets matching targetWorkspaceId
     return allShared.filter((t) => t.workspaceId === targetWorkspaceId);
   }
 
   try {
-    const { adminClient, isAdminConfigured } = await import("@/utils/supabase/admin");
     const queryClient = isAdminConfigured ? adminClient : await createClient();
     let query = queryClient
       .from("tickets")
@@ -675,7 +666,7 @@ export async function getAgentTickets(workspaceId?: string): Promise<Ticket[]> {
         )
       `);
 
-    if (targetWorkspaceId) {
+    if (targetWorkspaceId && UUID_REGEX.test(targetWorkspaceId)) {
       query = query.eq("workspace_id", targetWorkspaceId);
     }
 
