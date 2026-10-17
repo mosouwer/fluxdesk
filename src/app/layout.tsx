@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { CommandMenu } from "@/components/CommandMenu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,6 +27,7 @@ export default function RootLayout({
     <html lang="en" className="h-full">
       <body className={`${geistSans.variable} ${geistMono.variable} h-full font-sans antialiased selection:bg-zinc-900 selection:text-white bg-zinc-50/50 text-zinc-900`}>
         {children}
+        <CommandMenu />
       </body>
     </html>
   );

@@ -134,29 +134,34 @@ export function DeskHeader({
       {/* Global Search */}
       <div className="flex-1 max-w-md mx-6">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400 pointer-events-none" />
           <input
             ref={searchInputRef}
             type="text"
             value={currentQuery}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder="Search ticket #, owner, customer (name/phone)..."
-            className="w-full h-8 pl-9 pr-14 text-xs bg-slate-50 border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white transition-all text-slate-800 placeholder:text-slate-400"
+            placeholder="Search tickets, owners, customers..."
+            className="w-full h-8 pl-9 pr-14 text-xs bg-zinc-50 border border-zinc-200 rounded-md focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:bg-white transition-all text-zinc-800 placeholder:text-zinc-400"
           />
           {currentQuery ? (
             <button
               type="button"
               onClick={handleClear}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 p-0.5 rounded"
               title="Clear search"
             >
               <X className="h-3.5 w-3.5" />
             </button>
           ) : (
-            <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] bg-white border border-slate-200 text-slate-400 rounded px-1.5 py-0.5 font-mono shadow-2xs pointer-events-none">
-              /
-            </kbd>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent("fluxdesk:open-command-menu"))}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] bg-white border border-zinc-200 text-zinc-400 hover:text-zinc-700 rounded px-1.5 py-0.5 font-mono shadow-2xs cursor-pointer"
+              title="Open Command Menu (⌘K)"
+            >
+              ⌘K
+            </button>
           )}
         </div>
       </div>

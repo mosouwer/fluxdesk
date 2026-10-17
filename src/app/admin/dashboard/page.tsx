@@ -27,6 +27,7 @@ import {
   Sparkles,
   Settings,
   LogOut,
+  Search,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -306,6 +307,16 @@ export default async function AdminDashboardPage() {
           </div>
 
           <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent("fluxdesk:open-command-menu"))}
+              className="hidden md:inline-flex items-center gap-2 h-7.5 px-2.5 rounded-md text-xs font-medium bg-zinc-100 hover:bg-zinc-200/70 border border-zinc-200/80 text-zinc-500 hover:text-zinc-900 transition-colors shadow-2xs cursor-pointer"
+            >
+              <Search className="h-3.5 w-3.5 text-zinc-400" />
+              <span>Search or jump to...</span>
+              <kbd className="px-1.5 py-0.2 text-[10px] bg-white border border-zinc-200 rounded text-zinc-400 font-mono">⌘K</kbd>
+            </button>
+
             <Link
               href="/"
               className="text-xs font-medium text-zinc-600 hover:text-zinc-900 flex items-center gap-1.5 bg-zinc-100 hover:bg-zinc-200/70 px-2.5 py-1.5 rounded-md transition-colors border border-zinc-200/80"

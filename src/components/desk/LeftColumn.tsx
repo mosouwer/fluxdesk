@@ -134,6 +134,23 @@ export function LeftColumn({
 
   return (
     <aside className="w-60 border-r border-zinc-200/80 bg-zinc-50/80 flex flex-col h-full shrink-0 select-none">
+      {/* Clickable Command Menu Trigger */}
+      <div className="p-2 border-b border-zinc-200/80">
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new CustomEvent("fluxdesk:open-command-menu"))}
+          className="w-full h-8 px-2.5 rounded-md text-xs font-medium bg-white/80 border border-zinc-200/80 hover:bg-white hover:border-zinc-300 text-zinc-500 hover:text-zinc-900 transition-all flex items-center justify-between shadow-2xs group cursor-pointer"
+        >
+          <div className="flex items-center gap-2 truncate">
+            <Search className="h-3.5 w-3.5 text-zinc-400 group-hover:text-zinc-600 shrink-0" />
+            <span className="truncate">Search or jump to...</span>
+          </div>
+          <kbd className="px-1.5 py-0.5 text-[10px] bg-zinc-100 border border-zinc-200/80 rounded text-zinc-400 group-hover:text-zinc-600 font-mono">
+            ⌘K
+          </kbd>
+        </button>
+      </div>
+
       {/* Upper Section: Views List */}
       <div className="p-2.5 border-b border-zinc-200/80">
         <div className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 px-2 mb-1.5 flex items-center justify-between">
