@@ -115,25 +115,25 @@ export function SubmitTicketForm({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden text-left">
+    <div className="bg-white rounded-xl border border-zinc-200/80 shadow-2xs overflow-hidden text-left">
       {/* Form Header */}
-      <div className="p-6 border-b border-slate-100 bg-linear-to-b from-blue-50/50 to-white">
-        <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+      <div className="p-5 border-b border-zinc-200/80 bg-zinc-50/50">
+        <h2 className="text-base font-semibold text-zinc-900 tracking-tight">
           Submit a Support Request
         </h2>
-        <p className="text-xs text-slate-500 mt-1">
+        <p className="text-xs text-zinc-500 mt-1">
           Have an issue or question? Fill in the details below and our team will get back to you shortly.
         </p>
       </div>
 
       {/* Success Banner */}
       {createdTicket && (
-        <div className="m-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="h-8 w-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0">
-            <CheckCircle2 className="h-5 w-5" />
+        <div className="m-5 p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-3 transition-all duration-150">
+          <div className="h-8 w-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
+            <CheckCircle2 className="h-4 w-4" />
           </div>
           <div className="flex-1 text-xs">
-            <h4 className="font-bold text-emerald-950 text-sm">
+            <h4 className="font-semibold text-emerald-950 text-sm">
               Ticket #{createdTicket.number} Submitted Successfully!
             </h4>
             <p className="text-emerald-800 mt-0.5">
@@ -142,7 +142,7 @@ export function SubmitTicketForm({
             <button
               type="button"
               onClick={() => setCreatedTicket(null)}
-              className="mt-2 text-xs font-semibold text-emerald-700 hover:text-emerald-900 underline"
+              className="mt-2 text-xs font-medium text-emerald-700 hover:text-emerald-900 underline cursor-pointer"
             >
               Dismiss or Submit Another Request
             </button>
@@ -150,7 +150,7 @@ export function SubmitTicketForm({
           <button
             type="button"
             onClick={() => setCreatedTicket(null)}
-            className="text-emerald-400 hover:text-emerald-700"
+            className="text-emerald-500 hover:text-emerald-800 cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
@@ -159,18 +159,18 @@ export function SubmitTicketForm({
 
       {/* Error Banner */}
       {errorMsg && (
-        <div className="mx-6 mt-6 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-800 flex items-center gap-2">
+        <div className="mx-5 mt-5 p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-800 flex items-center gap-2">
           <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />
           <span>{errorMsg}</span>
         </div>
       )}
 
       {/* Form Fields */}
-      <form onSubmit={handleSubmit} className="p-6 space-y-5">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <form onSubmit={handleSubmit} className="p-5 space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3.5">
           {/* Subject */}
           <div className="md:col-span-2">
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-medium text-zinc-700 mb-1">
               Subject <span className="text-red-500">*</span>
             </label>
             <input
@@ -180,13 +180,13 @@ export function SubmitTicketForm({
               placeholder="e.g. Cannot access database replica in us-east-1"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="w-full h-9 px-3 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800 disabled:opacity-50"
+              className="w-full h-8.5 px-3 text-xs bg-zinc-50/50 border border-zinc-200 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 focus:bg-white text-zinc-900 disabled:opacity-50 transition-colors duration-100"
             />
           </div>
 
           {/* Contact Phone */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-medium text-zinc-700 mb-1">
               Phone Number <span className="text-red-500">*</span>
             </label>
             <input
@@ -196,20 +196,20 @@ export function SubmitTicketForm({
               placeholder="+1 (555) 000-0000"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full h-9 px-3 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800 disabled:opacity-50"
+              className="w-full h-8.5 px-3 text-xs bg-zinc-50/50 border border-zinc-200 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 focus:bg-white text-zinc-900 disabled:opacity-50 transition-colors duration-100"
             />
           </div>
 
           {/* Priority */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-medium text-zinc-700 mb-1">
               Priority
             </label>
             <select
               value={priority}
               disabled={isLoading}
               onChange={(e) => setPriority(e.target.value as TicketPriority)}
-              className="w-full h-9 px-3 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800 cursor-pointer disabled:opacity-50"
+              className="w-full h-8.5 px-2.5 text-xs bg-zinc-50/50 border border-zinc-200 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 focus:bg-white text-zinc-900 cursor-pointer disabled:opacity-50 transition-colors duration-100"
             >
               <option value="low">Low</option>
               <option value="normal">Normal</option>
@@ -221,7 +221,7 @@ export function SubmitTicketForm({
 
         {/* Description */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">
+          <label className="block text-xs font-medium text-zinc-700 mb-1">
             Description <span className="text-red-500">*</span>
           </label>
           <textarea
@@ -231,16 +231,16 @@ export function SubmitTicketForm({
             placeholder="Please describe the issue, steps to reproduce, or any error messages..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full p-3 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800 resize-y disabled:opacity-50"
+            className="w-full p-3 text-xs bg-zinc-50/50 border border-zinc-200 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 focus:bg-white text-zinc-900 resize-y disabled:opacity-50 transition-colors duration-100"
           />
         </div>
 
         {/* Attachment Upload Input */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">
+          <label className="block text-xs font-medium text-zinc-700 mb-1">
             Attachment (Optional)
           </label>
-          <div className="border-2 border-dashed border-slate-200 rounded-xl p-4 text-center hover:border-blue-400 transition-colors bg-slate-50/50">
+          <div className="border border-dashed border-zinc-200 rounded-xl p-4 text-center hover:border-zinc-400 transition-colors duration-100 bg-zinc-50/50">
             <input
               type="file"
               ref={fileInputRef}
@@ -251,11 +251,11 @@ export function SubmitTicketForm({
             />
 
             {file ? (
-              <div className="flex items-center justify-between bg-white px-3 py-2 rounded-lg border border-slate-200 text-xs text-slate-700 max-w-sm mx-auto shadow-2xs">
+              <div className="flex items-center justify-between bg-white px-3 py-2 rounded-lg border border-zinc-200/80 text-xs text-zinc-700 max-w-sm mx-auto shadow-2xs">
                 <div className="flex items-center gap-2 truncate">
-                  <FileText className="h-4 w-4 text-blue-500 shrink-0" />
+                  <FileText className="h-4 w-4 text-zinc-500 shrink-0" />
                   <span className="font-medium truncate">{file.name}</span>
-                  <span className="text-[10px] text-slate-400">
+                  <span className="text-[10px] text-zinc-400">
                     ({(file.size / 1024).toFixed(1)} KB)
                   </span>
                 </div>
@@ -263,7 +263,7 @@ export function SubmitTicketForm({
                   type="button"
                   disabled={isLoading}
                   onClick={handleRemoveFile}
-                  className="text-slate-400 hover:text-red-500 p-1 rounded transition-colors"
+                  className="text-zinc-400 hover:text-red-500 p-1 rounded transition-colors cursor-pointer"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -273,12 +273,12 @@ export function SubmitTicketForm({
                 htmlFor="submit-file-input"
                 className="cursor-pointer flex flex-col items-center gap-1.5"
               >
-                <UploadCloud className="h-6 w-6 text-slate-400" />
-                <span className="text-xs font-semibold text-blue-600 hover:underline">
+                <UploadCloud className="h-5 w-5 text-zinc-400" />
+                <span className="text-xs font-medium text-zinc-900 hover:underline">
                   Choose a file to attach
                 </span>
-                <span className="text-[11px] text-slate-400">
-                  Screenshots, logs, or documents up to 25MB (stored in Supabase ticket-attachments)
+                <span className="text-[11px] text-zinc-400">
+                  Screenshots, logs, or documents up to 25MB
                 </span>
               </label>
             )}
@@ -287,14 +287,14 @@ export function SubmitTicketForm({
 
         {/* Submit Action */}
         <div className="pt-2 flex items-center justify-between">
-          <span className="text-[11px] text-slate-400">
-            Submitting as <strong className="text-slate-600">{customerEmail}</strong>
+          <span className="text-[11px] text-zinc-400">
+            Submitting as <strong className="text-zinc-600 font-medium">{customerEmail}</strong>
           </span>
 
           <Button
             type="submit"
             disabled={isLoading || !subject.trim() || !description.trim()}
-            className="h-9 px-6 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white gap-2 shadow-xs"
+            className="h-8.5 px-5 text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-white gap-2 rounded-lg shadow-2xs cursor-pointer"
           >
             {isLoading ? (
               <>

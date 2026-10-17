@@ -528,28 +528,28 @@ export function AgentDeskClient({
       />
 
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-3 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-800 animate-in fade-in slide-in-from-bottom-3 duration-200">
+        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-3 bg-zinc-900 text-white px-3.5 py-2.5 rounded-lg shadow-xl border border-zinc-800 transition-all duration-150">
           {toastMessage.type === "internal" ? (
-            <div className="h-8 w-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
-              <Lock className="h-4 w-4" />
+            <div className="h-7 w-7 rounded-md bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+              <Lock className="h-3.5 w-3.5" />
             </div>
           ) : toastMessage.type === "macro" ? (
-            <div className="h-8 w-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
-              <Zap className="h-4 w-4" />
+            <div className="h-7 w-7 rounded-md bg-zinc-800 text-zinc-300 flex items-center justify-center shrink-0">
+              <Zap className="h-3.5 w-3.5" />
             </div>
           ) : toastMessage.type === "realtime" ? (
-            <div className="h-8 w-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
-              <Radio className="h-4 w-4 animate-pulse" />
+            <div className="h-7 w-7 rounded-md bg-zinc-800 text-zinc-300 flex items-center justify-center shrink-0">
+              <Radio className="h-3.5 w-3.5" />
             </div>
           ) : (
-            <div className="h-8 w-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-              <CheckCircle2 className="h-4 w-4" />
+            <div className="h-7 w-7 rounded-md bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+              <CheckCircle2 className="h-3.5 w-3.5" />
             </div>
           )}
           <div className="text-xs">
-            <p className="font-semibold">{toastMessage.title}</p>
+            <p className="font-semibold text-zinc-100">{toastMessage.title}</p>
             {toastMessage.detail && (
-              <p className="text-[11px] text-slate-400">{toastMessage.detail}</p>
+              <p className="text-[11px] text-zinc-400">{toastMessage.detail}</p>
             )}
           </div>
         </div>

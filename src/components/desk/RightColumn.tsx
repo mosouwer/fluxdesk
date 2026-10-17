@@ -175,7 +175,7 @@ export function RightColumn({
       </div>
 
       {/* 2. Ticket Properties & Assignment Section */}
-      <div className="space-y-4">
+      <div className="bg-white p-3.5 rounded-xl border border-zinc-200/80 shadow-2xs space-y-3.5">
         <div className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
           Ticket Properties
         </div>
@@ -188,7 +188,7 @@ export function RightColumn({
               <button
                 type="button"
                 onClick={() => onUpdateTicket({ assignedAgent: currentUser })}
-                className="text-[11px] text-zinc-900 hover:text-zinc-700 font-semibold hover:underline"
+                className="text-[11px] text-zinc-900 hover:text-zinc-600 font-semibold cursor-pointer"
               >
                 Assign to me
               </button>
@@ -207,7 +207,7 @@ export function RightColumn({
                   if (agent) onUpdateTicket({ assignedAgent: agent });
                 }
               }}
-              className="w-full h-8 pl-3 pr-8 text-xs bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-zinc-400 text-zinc-900 appearance-none font-medium cursor-pointer shadow-2xs"
+              className="w-full h-8 pl-3 pr-8 text-xs bg-zinc-50/70 hover:bg-zinc-50 border border-zinc-200/80 rounded-lg focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:bg-white text-zinc-900 appearance-none font-medium cursor-pointer shadow-2xs transition-colors"
             >
               <option value="unassigned">— Unassigned —</option>
               {effectiveAgents.map((agent) => (
@@ -231,7 +231,7 @@ export function RightColumn({
               onChange={(e) =>
                 onUpdateTicket({ status: e.target.value as TicketStatus })
               }
-              className="w-full h-8 pl-3 pr-8 text-xs bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-zinc-400 text-zinc-900 appearance-none font-medium cursor-pointer shadow-2xs"
+              className="w-full h-8 pl-3 pr-8 text-xs bg-zinc-50/70 hover:bg-zinc-50 border border-zinc-200/80 rounded-lg focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:bg-white text-zinc-900 appearance-none font-medium cursor-pointer shadow-2xs transition-colors"
             >
               <option value="open">Open</option>
               <option value="pending">Pending</option>
@@ -254,7 +254,7 @@ export function RightColumn({
               onChange={(e) =>
                 onUpdateTicket({ priority: e.target.value as TicketPriority })
               }
-              className="w-full h-8 pl-3 pr-8 text-xs bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-zinc-400 text-zinc-900 appearance-none font-medium cursor-pointer shadow-2xs"
+              className="w-full h-8 pl-3 pr-8 text-xs bg-zinc-50/70 hover:bg-zinc-50 border border-zinc-200/80 rounded-lg focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:bg-white text-zinc-900 appearance-none font-medium cursor-pointer shadow-2xs transition-colors"
             >
               <option value="urgent">Urgent</option>
               <option value="high">High</option>
@@ -270,75 +270,78 @@ export function RightColumn({
           <label className="text-[11px] font-medium text-zinc-400 block">
             Originating Channel
           </label>
-          <div className="text-xs font-medium text-zinc-700 bg-zinc-100/70 border border-zinc-200/80 px-3 py-1.5 rounded-lg capitalize">
+          <div className="text-xs font-medium text-zinc-700 bg-zinc-50 border border-zinc-200/80 px-2.5 py-1.5 rounded-lg capitalize">
             {ticket.channel} Support
           </div>
         </div>
+      </div>
 
-        {/* Tags Control */}
-        <div className="space-y-2 pt-2 border-t border-zinc-200/60">
-          <div className="flex items-center justify-between text-xs font-medium text-zinc-700">
-            <span className="flex items-center gap-1.5">
-              <Tag className="h-3 w-3 text-zinc-400" />
-              <span>Tags</span>
-            </span>
-            {!isAddingTag && (
-              <button
-                type="button"
-                onClick={() => setIsAddingTag(true)}
-                className="text-[11px] text-zinc-900 hover:text-zinc-600 font-semibold flex items-center gap-0.5"
-              >
-                <Plus className="h-3 w-3" />
-                Add
-              </button>
-            )}
-          </div>
-
-          {/* Tag Pill List */}
-          <div className="flex flex-wrap gap-1.5">
-            {ticket.tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center gap-1 text-[11px] bg-zinc-100 text-zinc-700 font-mono px-2 py-0.5 rounded-md border border-zinc-200 group"
-              >
-                <span>{tag}</span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveTag(tag)}
-                  className="hover:text-red-600 rounded-xs"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            ))}
-          </div>
-
-          {/* Add Tag Inline Form */}
-          {isAddingTag && (
-            <form onSubmit={handleAddTag} className="flex items-center gap-1 mt-1">
-              <input
-                type="text"
-                value={newTagInput}
-                onChange={(e) => setNewTagInput(e.target.value)}
-                placeholder="tag-name..."
-                autoFocus
-                className="flex-1 h-7 text-xs px-2 bg-white border border-zinc-300 rounded-md focus:outline-none focus:ring-1 focus:ring-zinc-500"
-              />
-              <Button type="submit" size="sm" className="h-7 px-2 text-xs bg-zinc-900 hover:bg-zinc-800 text-white">
-                Save
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsAddingTag(false)}
-                className="h-7 px-1.5 text-xs text-zinc-400 hover:text-zinc-700"
-              >
-                <X className="h-3.5 w-3.5" />
-              </Button>
-            </form>
+      {/* 3. Tags & Categorization Card */}
+      <div className="bg-white p-3.5 rounded-xl border border-zinc-200/80 shadow-2xs space-y-3">
+        <div className="flex items-center justify-between text-xs font-medium text-zinc-700">
+          <span className="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-[11px] text-zinc-400">
+            <Tag className="h-3 w-3 text-zinc-400" />
+            <span>Tags</span>
+          </span>
+          {!isAddingTag && (
+            <button
+              type="button"
+              onClick={() => setIsAddingTag(true)}
+              className="text-[11px] text-zinc-900 hover:text-zinc-600 font-semibold flex items-center gap-0.5 cursor-pointer"
+            >
+              <Plus className="h-3 w-3" />
+              Add
+            </button>
           )}
         </div>
+
+        {/* Tag Pill List */}
+        <div className="flex flex-wrap gap-1.5">
+          {ticket.tags.length === 0 && !isAddingTag && (
+            <span className="text-[11px] text-zinc-400 italic">No tags applied</span>
+          )}
+          {ticket.tags.map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center gap-1 text-[11px] bg-zinc-100 text-zinc-700 font-mono px-2 py-0.5 rounded-md border border-zinc-200/80 group"
+            >
+              <span>{tag}</span>
+              <button
+                type="button"
+                onClick={() => handleRemoveTag(tag)}
+                className="hover:text-red-600 rounded-xs cursor-pointer"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+
+        {/* Add Tag Inline Form */}
+        {isAddingTag && (
+          <form onSubmit={handleAddTag} className="flex items-center gap-1 mt-1">
+            <input
+              type="text"
+              value={newTagInput}
+              onChange={(e) => setNewTagInput(e.target.value)}
+              placeholder="tag-name..."
+              autoFocus
+              className="flex-1 h-7 text-xs px-2 bg-zinc-50 border border-zinc-300 rounded-md focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:bg-white"
+            />
+            <Button type="submit" size="sm" className="h-7 px-2 text-xs bg-zinc-900 hover:bg-zinc-800 text-white cursor-pointer">
+              Save
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsAddingTag(false)}
+              className="h-7 px-1.5 text-xs text-zinc-400 hover:text-zinc-700 cursor-pointer"
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          </form>
+        )}
       </div>
     </aside>
   );

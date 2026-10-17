@@ -23,18 +23,14 @@ export function AgentCollisionBanner({
     <div className="space-y-2 mb-3">
       {/* 1. Critical Collision Warning: Agent currently drafting a reply */}
       {agentsTyping.length > 0 && (
-        <div className="bg-amber-500/10 border-2 border-amber-500/40 rounded-xl p-3 shadow-md backdrop-blur-xs animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="bg-amber-50/80 border border-amber-200/80 rounded-xl p-3 shadow-2xs transition-all duration-150">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              {/* Alert Icon with pulse badge */}
+              {/* Alert Icon */}
               <div className="relative shrink-0">
-                <div className="h-9 w-9 rounded-lg bg-amber-500 text-white flex items-center justify-center shadow-sm">
-                  <AlertTriangle className="h-5 w-5" />
+                <div className="h-8 w-8 rounded-lg bg-amber-100 text-amber-900 border border-amber-200/80 flex items-center justify-center">
+                  <AlertTriangle className="h-4 w-4 text-amber-700" />
                 </div>
-                <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500" />
-                </span>
               </div>
 
               {/* Message Details */}
@@ -91,17 +87,17 @@ export function AgentCollisionBanner({
 
       {/* 2. Passive Presence Banner: Another agent viewing the ticket */}
       {agentsTyping.length === 0 && agentsViewing.length > 0 && (
-        <div className="bg-blue-50/80 border border-blue-200 rounded-lg px-3 py-2 text-xs flex items-center justify-between shadow-2xs">
-          <div className="flex items-center gap-2 text-blue-900">
-            <Eye className="h-4 w-4 text-blue-600 shrink-0" />
-            <span className="font-medium">
+        <div className="bg-zinc-50/90 border border-zinc-200/80 rounded-lg px-3 py-2 text-xs flex items-center justify-between shadow-2xs">
+          <div className="flex items-center gap-2 text-zinc-700">
+            <Eye className="h-3.5 w-3.5 text-zinc-500 shrink-0" />
+            <span className="font-normal">
               {agentsViewing.length === 1 ? (
                 <>
-                  Agent <strong>{agentsViewing[0].agentName}</strong> is also viewing this ticket.
+                  Agent <strong className="font-semibold text-zinc-900">{agentsViewing[0].agentName}</strong> is also viewing this ticket.
                 </>
               ) : (
                 <>
-                  <strong>{agentsViewing.length} agents</strong> ({agentsViewing.map((a) => a.agentName).join(", ")}) are viewing this ticket.
+                  <strong className="font-semibold text-zinc-900">{agentsViewing.length} agents</strong> ({agentsViewing.map((a) => a.agentName).join(", ")}) are viewing this ticket.
                 </>
               )}
             </span>
@@ -114,7 +110,7 @@ export function AgentCollisionBanner({
                 src={agent.agentAvatar}
                 fallback={agent.agentName[0]}
                 size="sm"
-                className="h-6 w-6 border-2 border-white ring-1 ring-blue-300"
+                className="h-5 w-5 border-2 border-white ring-1 ring-zinc-200"
               />
             ))}
           </div>

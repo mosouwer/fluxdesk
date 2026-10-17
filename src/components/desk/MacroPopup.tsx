@@ -55,13 +55,13 @@ export function MacroPopup({ isOpen, onClose, macros, onApplyMacro }: MacroPopup
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-slate-900/40 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-black/30 backdrop-blur-xs transition-opacity duration-150">
       <div
-        className="w-full max-w-lg bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-100"
+        className="w-full max-w-lg bg-white rounded-xl shadow-xl border border-zinc-200/80 overflow-hidden"
         onKeyDown={handleKeyDown}
       >
         {/* Search Header */}
-        <div className="p-3 border-b border-slate-200 bg-slate-50 flex items-center gap-2">
+        <div className="p-3 border-b border-zinc-200/80 bg-zinc-50/70 flex items-center gap-2.5">
           <Zap className="h-4 w-4 text-amber-500 fill-amber-500 shrink-0" />
           <input
             ref={inputRef}
@@ -71,21 +71,21 @@ export function MacroPopup({ isOpen, onClose, macros, onApplyMacro }: MacroPopup
               setSearch(e.target.value);
               setSelectedIndex(0);
             }}
-            placeholder="Type a macro name or action..."
-            className="flex-1 text-sm bg-transparent border-none focus:outline-none text-slate-800 placeholder:text-slate-400"
+            placeholder="Search macros or quick responses..."
+            className="flex-1 text-xs bg-transparent border-none focus:outline-hidden text-zinc-900 placeholder:text-zinc-400"
           />
           <button
             onClick={onClose}
-            className="h-6 w-6 rounded-md hover:bg-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-600"
+            className="h-6 w-6 rounded-md hover:bg-zinc-200/70 flex items-center justify-center text-zinc-400 hover:text-zinc-700 transition-colors duration-100 cursor-pointer"
           >
             <X className="h-3.5 w-3.5" />
           </button>
         </div>
 
         {/* Macro List */}
-        <div className="max-h-80 overflow-y-auto divide-y divide-slate-100 p-1.5">
+        <div className="max-h-80 overflow-y-auto divide-y divide-zinc-100 p-1.5">
           {filteredMacros.length === 0 ? (
-            <div className="p-8 text-center text-xs text-slate-400">
+            <div className="p-8 text-center text-xs text-zinc-400">
               No macros found matching &quot;{search}&quot;.
             </div>
           ) : (
@@ -100,20 +100,20 @@ export function MacroPopup({ isOpen, onClose, macros, onApplyMacro }: MacroPopup
                   }}
                   onMouseEnter={() => setSelectedIndex(idx)}
                   className={cn(
-                    "p-3 rounded-lg cursor-pointer transition-colors text-left flex items-start justify-between gap-3",
-                    isSelected ? "bg-blue-50/80 text-blue-900" : "hover:bg-slate-50 text-slate-700"
+                    "p-3 rounded-lg cursor-pointer transition-colors duration-100 text-left flex items-start justify-between gap-3",
+                    isSelected ? "bg-zinc-100 text-zinc-900 ring-1 ring-zinc-900/5" : "hover:bg-zinc-50/80 text-zinc-700"
                   )}
                 >
                   <div className="space-y-1 flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-xs text-slate-900">
+                      <span className="font-semibold text-xs text-zinc-900">
                         {macro.title}
                       </span>
-                      <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-zinc-200 text-zinc-500 bg-zinc-50">
                         {macro.category}
                       </Badge>
                     </div>
-                    <p className="text-xs text-slate-500 line-clamp-1">
+                    <p className="text-xs text-zinc-500 line-clamp-1">
                       {macro.description}
                     </p>
 
@@ -122,11 +122,11 @@ export function MacroPopup({ isOpen, onClose, macros, onApplyMacro }: MacroPopup
                       {macro.actions.map((act, i) => (
                         <span
                           key={i}
-                          className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono flex items-center gap-1"
+                          className="text-[10px] bg-zinc-100/80 text-zinc-600 px-1.5 py-0.5 rounded-md font-mono border border-zinc-200/50 flex items-center gap-1"
                         >
                           {act.action === "add_comment" && (
                             <>
-                              <Sparkles className="h-2.5 w-2.5 text-blue-500" />
+                              <Sparkles className="h-2.5 w-2.5 text-zinc-500" />
                               <span>{act.type === "internal_note" ? "Internal Note" : "Public Reply"}</span>
                             </>
                           )}
@@ -140,12 +140,12 @@ export function MacroPopup({ isOpen, onClose, macros, onApplyMacro }: MacroPopup
 
                   <div className="shrink-0 flex items-center pt-1">
                     {isSelected ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 bg-blue-100 px-2 py-0.5 rounded">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-900 bg-white border border-zinc-200/80 px-2 py-0.5 rounded-md shadow-2xs">
                         <span>Apply</span>
                         <CornerDownLeft className="h-3 w-3" />
                       </span>
                     ) : (
-                      <ArrowRight className="h-3.5 w-3.5 text-slate-300" />
+                      <ArrowRight className="h-3.5 w-3.5 text-zinc-300" />
                     )}
                   </div>
                 </div>
@@ -155,18 +155,18 @@ export function MacroPopup({ isOpen, onClose, macros, onApplyMacro }: MacroPopup
         </div>
 
         {/* Footer shortcuts hint */}
-        <div className="px-3 py-2 bg-slate-50 border-t border-slate-200 text-[11px] text-slate-500 flex items-center justify-between">
+        <div className="px-3.5 py-2 bg-zinc-50/70 border-t border-zinc-200/80 text-[11px] text-zinc-400 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span>
-              <kbd className="bg-white border border-slate-300 px-1 py-0.5 rounded text-[10px] font-mono shadow-2xs">↑</kbd>
-              <kbd className="bg-white border border-slate-300 px-1 py-0.5 rounded text-[10px] font-mono shadow-2xs ml-0.5">↓</kbd> to navigate
+              <kbd className="bg-white border border-zinc-200 px-1 py-0.5 rounded text-[10px] font-mono shadow-2xs text-zinc-600">↑</kbd>
+              <kbd className="bg-white border border-zinc-200 px-1 py-0.5 rounded text-[10px] font-mono shadow-2xs ml-0.5 text-zinc-600">↓</kbd> navigate
             </span>
             <span>
-              <kbd className="bg-white border border-slate-300 px-1.5 py-0.5 rounded text-[10px] font-mono shadow-2xs">Enter</kbd> to apply
+              <kbd className="bg-white border border-zinc-200 px-1.5 py-0.5 rounded text-[10px] font-mono shadow-2xs text-zinc-600">Enter</kbd> apply
             </span>
           </div>
           <span>
-            <kbd className="bg-white border border-slate-300 px-1 py-0.5 rounded text-[10px] font-mono shadow-2xs">Esc</kbd> to close
+            <kbd className="bg-white border border-zinc-200 px-1 py-0.5 rounded text-[10px] font-mono shadow-2xs text-zinc-600">Esc</kbd> close
           </span>
         </div>
       </div>

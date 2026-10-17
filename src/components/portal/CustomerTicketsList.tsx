@@ -130,10 +130,10 @@ export function CustomerTicketsList({
       {/* Action Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+          <h2 className="text-lg font-semibold text-zinc-900 tracking-tight">
             {selectedTicket ? "Request Details" : "My Requests"}
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-zinc-500 mt-0.5">
             {selectedTicket
               ? `Viewing conversation on #${selectedTicket.number}`
               : "Track the status of your active and past support tickets."}
@@ -144,7 +144,7 @@ export function CustomerTicketsList({
           {selectedTicket ? (
             <button
               onClick={() => setSelectedTicketId(null)}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-2xs hover:bg-slate-50 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-600 hover:text-zinc-900 bg-white border border-zinc-200/80 px-3 py-1.5 rounded-lg shadow-2xs hover:bg-zinc-50 transition-colors duration-100 cursor-pointer"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               <span>Back to Tickets</span>
@@ -153,7 +153,7 @@ export function CustomerTicketsList({
             <Button
               onClick={() => setShowSubmitModal((prev) => !prev)}
               size="sm"
-              className="h-8 gap-1.5 text-xs bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
+              className="h-8 gap-1.5 text-xs bg-zinc-900 hover:bg-zinc-800 text-white font-medium rounded-lg shadow-2xs cursor-pointer"
             >
               <PlusCircle className="h-3.5 w-3.5" />
               <span>{showSubmitModal ? "Close Form" : "Submit Request"}</span>
@@ -177,25 +177,25 @@ export function CustomerTicketsList({
       {!selectedTicket && (
         <div className="space-y-3">
           {tickets.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-400 shadow-2xs">
-              <Inbox className="h-10 w-10 mx-auto mb-2 text-slate-300" />
-              <h3 className="text-sm font-semibold text-slate-700">No support requests</h3>
-              <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+            <div className="bg-white rounded-xl border border-zinc-200/80 p-12 text-center text-zinc-400 shadow-2xs">
+              <Inbox className="h-10 w-10 mx-auto mb-2 text-zinc-300" />
+              <h3 className="text-sm font-semibold text-zinc-700">No support requests</h3>
+              <p className="text-xs text-zinc-400 mt-1 max-w-sm mx-auto">
                 You haven&apos;t submitted any support requests yet. Use the button above to submit your first inquiry.
               </p>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-xs divide-y divide-slate-100 overflow-hidden">
+            <div className="bg-white rounded-xl border border-zinc-200/80 shadow-2xs divide-y divide-zinc-100 overflow-hidden">
               {tickets.map((ticket) => (
                 <div
                   key={ticket.id}
                   onClick={() => setSelectedTicketId(ticket.id)}
-                  className="p-4 hover:bg-slate-50/80 cursor-pointer transition-colors flex items-center justify-between gap-4 group"
+                  className="p-4 hover:bg-zinc-50/80 cursor-pointer transition-colors duration-100 flex items-center justify-between gap-4 group"
                 >
                   <div className="space-y-1.5 min-w-0 flex-1">
                     {/* Header Row: Ticket #, Status, Priority */}
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
+                      <span className="font-mono text-xs font-medium text-zinc-500 bg-zinc-100 border border-zinc-200/80 px-2 py-0.5 rounded">
                         #{ticket.number}
                       </span>
                       <StatusBadge status={ticket.status} />
@@ -203,14 +203,14 @@ export function CustomerTicketsList({
                     </div>
 
                     {/* Subject */}
-                    <h3 className="text-xs font-semibold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
+                    <h3 className="text-xs font-semibold text-zinc-900 group-hover:text-zinc-700 transition-colors duration-100 truncate">
                       {ticket.subject}
                     </h3>
 
                     {/* Metadata Row: Created Date & Message count */}
-                    <div className="flex items-center gap-3 text-[11px] text-slate-400">
+                    <div className="flex items-center gap-3 text-[11px] text-zinc-400">
                       <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3 text-slate-400" />
+                        <Calendar className="h-3 w-3 text-zinc-400" />
                         Created {new Date(ticket.createdAt).toLocaleDateString()}
                       </span>
                       <span>•</span>
@@ -220,7 +220,7 @@ export function CustomerTicketsList({
                     </div>
                   </div>
 
-                  <div className="shrink-0 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all">
+                  <div className="shrink-0 text-zinc-400 group-hover:text-zinc-700 transition-colors duration-100">
                     <ChevronRight className="h-4 w-4" />
                   </div>
                 </div>
@@ -232,34 +232,34 @@ export function CustomerTicketsList({
 
       {/* 2. CLICKABLE DETAIL & PUBLIC CONVERSATION THREAD */}
       {selectedTicket && (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-zinc-200/80 shadow-2xs overflow-hidden">
           {/* Ticket Header */}
-          <div className="p-6 border-b border-slate-200 bg-slate-50/50">
+          <div className="p-5 border-b border-zinc-200/80 bg-zinc-50/50">
             <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
               <div className="flex items-center gap-2">
-                <span className="font-mono text-xs font-bold text-slate-700 bg-slate-200/80 px-2.5 py-0.5 rounded">
+                <span className="font-mono text-xs font-medium text-zinc-700 bg-zinc-200/80 px-2.5 py-0.5 rounded">
                   #{selectedTicket.number}
                 </span>
-                {/* Read-Only Status Badge for Customers: Cannot change status to solved */}
+                {/* Read-Only Status Badge for Customers */}
                 <StatusBadge status={selectedTicket.status} />
                 <PriorityBadge priority={selectedTicket.priority} />
               </div>
 
-              <div className="flex items-center gap-2 text-xs text-slate-500">
-                <Clock className="h-3.5 w-3.5 text-slate-400" />
+              <div className="flex items-center gap-2 text-xs text-zinc-500">
+                <Clock className="h-3.5 w-3.5 text-zinc-400" />
                 <span>Created {new Date(selectedTicket.createdAt).toLocaleDateString()}</span>
               </div>
             </div>
 
-            <h2 className="text-base font-bold text-slate-900 tracking-tight">
+            <h2 className="text-sm font-semibold text-zinc-900 tracking-tight">
               {selectedTicket.subject}
             </h2>
           </div>
 
           {/* Thread: Strictly Masking Internal Notes */}
-          <div className="p-6 space-y-4 max-h-[500px] overflow-y-auto bg-slate-50/30">
+          <div className="p-5 space-y-3.5 max-h-[500px] overflow-y-auto bg-zinc-50/30">
             {publicMessages.length === 0 ? (
-              <div className="p-8 text-center text-xs text-slate-400">
+              <div className="p-8 text-center text-xs text-zinc-400">
                 No public messages in this thread yet.
               </div>
             ) : (
@@ -274,43 +274,44 @@ export function CustomerTicketsList({
                     className={cn(
                       "rounded-xl border p-4 text-left shadow-2xs",
                       isAuthor
-                        ? "bg-white border-slate-200"
-                        : "bg-blue-50/70 border-blue-200/90"
+                        ? "bg-white border-zinc-200/80"
+                        : "bg-zinc-50/80 border-zinc-200/80"
                     )}
                   >
-                    <div className="flex items-center justify-between border-b pb-2 mb-2 text-xs">
+                    <div className="flex items-center justify-between border-b border-zinc-100 pb-2 mb-2 text-xs">
                       <div className="flex items-center gap-2">
                         <Avatar
                           src={msg.sender.avatar}
                           fallback={msg.sender.name[0]}
                           size="sm"
+                          className="h-6 w-6 text-xs"
                         />
                         <div>
-                          <span className="font-semibold text-slate-900">
+                          <span className="font-semibold text-zinc-900">
                             {msg.sender.name}
                           </span>
-                          <span className="text-[11px] text-slate-500 ml-1.5 font-normal">
+                          <span className="text-[11px] text-zinc-500 ml-1.5 font-normal">
                             {isAuthor ? "(You)" : "(Support Agent)"}
                           </span>
                         </div>
                       </div>
-                      <span className="text-[11px] text-slate-400">
+                      <span className="text-[11px] text-zinc-400">
                         {msg.createdAt}
                       </span>
                     </div>
 
-                    <div className="text-xs leading-relaxed text-slate-800 whitespace-pre-wrap">
+                    <div className="text-xs leading-relaxed text-zinc-800 whitespace-pre-wrap font-sans">
                       {msg.body}
                     </div>
 
                     {msg.attachments && msg.attachments.length > 0 && (
-                      <div className="mt-3 pt-2 border-t border-slate-200/60 flex flex-wrap gap-2">
+                      <div className="mt-3 pt-2 border-t border-zinc-100 flex flex-wrap gap-2">
                         {msg.attachments.map((att, i) => (
                           <div
                             key={i}
-                            className="inline-flex items-center gap-1.5 text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md border border-slate-200"
+                            className="inline-flex items-center gap-1.5 text-xs bg-zinc-100 text-zinc-700 px-2.5 py-1 rounded-md border border-zinc-200/80"
                           >
-                            <FileText className="h-3.5 w-3.5 text-blue-500" />
+                            <FileText className="h-3.5 w-3.5 text-zinc-500" />
                             <span className="font-mono text-[11px]">{att.filename}</span>
                           </div>
                         ))}
@@ -323,10 +324,10 @@ export function CustomerTicketsList({
           </div>
 
           {/* Customer Reply Box (Always Public Reply) */}
-          <div className="p-6 border-t border-slate-200 bg-white">
+          <div className="p-5 border-t border-zinc-200/80 bg-white">
             <form onSubmit={handleSendReply} className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-medium text-zinc-700 mb-1">
                   Add a reply
                 </label>
                 <textarea
@@ -335,7 +336,7 @@ export function CustomerTicketsList({
                   placeholder="Type your response to the support team..."
                   value={replyBody}
                   onChange={(e) => setReplyBody(e.target.value)}
-                  className="w-full p-3 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800 resize-none"
+                  className="w-full p-3 text-xs bg-zinc-50/50 border border-zinc-200 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 focus:bg-white text-zinc-900 resize-none transition-colors duration-100"
                 />
               </div>
 
@@ -353,7 +354,7 @@ export function CustomerTicketsList({
                   />
                   <label
                     htmlFor="list-reply-file-input"
-                    className="cursor-pointer inline-flex items-center gap-1 text-xs text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-md transition-colors"
+                    className="cursor-pointer inline-flex items-center gap-1 text-xs text-zinc-600 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200/70 px-2.5 py-1.5 rounded-md transition-colors duration-100"
                   >
                     <Paperclip className="h-3.5 w-3.5" />
                     <span>{replyFile ? replyFile.name : "Attach File"}</span>
@@ -362,7 +363,7 @@ export function CustomerTicketsList({
                     <button
                       type="button"
                       onClick={() => setReplyFile(null)}
-                      className="text-slate-400 hover:text-red-500"
+                      className="text-zinc-400 hover:text-red-500 cursor-pointer"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
@@ -372,7 +373,7 @@ export function CustomerTicketsList({
                 <Button
                   type="submit"
                   disabled={!replyBody.trim() || isSendingReply}
-                  className="h-8 px-4 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white gap-1.5"
+                  className="h-8 px-4 text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-white gap-1.5 rounded-lg shadow-2xs cursor-pointer"
                 >
                   {isSendingReply ? (
                     <>
