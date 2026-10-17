@@ -1,10 +1,11 @@
+import { createServerClient } from "@supabase/ssr";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 /**
  * Server-side Supabase client that strictly enforces Row-Level Security (RLS)
- * by using the public Anon Key and forwarding the user's authentication cookies.
- * MUST only be imported in Server Components, Server Actions, or Route Handlers.
+ * using @supabase/ssr to automatically persist and refresh authentication cookies.
+ * MUST only be imported and called on the server (Server Components, Server Actions, Route Handlers).
  */
 export async function createClient() {
   if (typeof window !== "undefined") {
@@ -12,6 +13,8 @@ export async function createClient() {
       "SECURITY ERROR: @/utils/supabase/server must only be imported and called on the server."
     );
   }
+
+  const cookieStore = await cookies();
 
   const supabaseUrl =
     process.env.NEXT_PUBLIC_SUPABASE_URL ||
@@ -23,62 +26,29 @@ export async function createClient() {
     process.env.SUPABASE_ANON_KEY ||
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder";
 
-  let cookieHeader = "";
-  let authBearer = "";
-
-  try {
-    const cookieStore = await cookies();
-    cookieHeader = cookieStore.toString();
-
-    // Look for JWT auth tokens in cookies
-    for (const cookie of cookieStore.getAll()) {
-      if (
-        cookie.name.includes("-auth-token") ||
-        cookie.name === "sb-access-token" ||
-        cookie.name === "supabase-auth-token"
-      ) {
+  return createServerClient(supabaseUrl, anonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(cookiesToSet) {
         try {
-          const parsed = JSON.parse(cookie.value);
-          if (Array.isArray(parsed) && parsed[0]) {
-            authBearer = parsed[0];
-          } else if (parsed?.access_token) {
-            authBearer = parsed.access_token;
-          }
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          );
         } catch {
-          if (cookie.value.startsWith("ey")) {
-            authBearer = cookie.value;
-          }
+          // The `setAll` method was called from a Server Component.
+          // This can be ignored if middleware is refreshing sessions.
         }
-      }
-    }
-  } catch {
-    // In contexts where cookies() is not available (e.g. static generation)
-  }
-
-  const headers: Record<string, string> = {};
-  if (cookieHeader) {
-    headers["Cookie"] = cookieHeader;
-  }
-  if (authBearer) {
-    headers["Authorization"] = `Bearer ${authBearer}`;
-  }
-
-  return createSupabaseClient(supabaseUrl, anonKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-    global: {
-      headers,
+      },
     },
   });
 }
 
 /**
- * Fallback static server instance using the public Anon Key.
- * Notice: SUPABASE_SERVICE_ROLE_KEY is NEVER used here to ensure RLS is never bypassed.
+ * Fallback static server instance using the public Anon Key without cookies.
  */
-export function createServerClient() {
+export function createStaticClient() {
   if (typeof window !== "undefined") {
     throw new Error(
       "SECURITY ERROR: @/utils/supabase/server must only be imported and called on the server."
@@ -111,4 +81,4 @@ export const isLiveSupabaseConfigured = Boolean(
     !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.includes("placeholder")
 );
 
-export const serverSupabase = createServerClient();
+export const serverSupabase = createStaticClient();

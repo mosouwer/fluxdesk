@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { serverSupabase as supabase, isLiveSupabaseConfigured } from "@/utils/supabase/server";
+import { serverSupabase as supabase, createClient, isLiveSupabaseConfigured } from "@/utils/supabase/server";
 import { adminClient, isAdminConfigured } from "@/utils/supabase/admin";
 import { getCurrentSessionUser } from "@/app/actions/auth";
 import { addSharedWorkspace, setActiveWorkspace, getActiveWorkspace } from "@/data/workspaceStore";
@@ -182,7 +182,8 @@ export async function onboardBrandWithAccount(input: OnboardBrandAccountInput) {
       // Automatically sign in the user via Supabase Auth so cookies are set!
       if (isLiveSupabaseConfigured) {
         try {
-          await supabase.auth.signInWithPassword({
+          const ssrClient = await createClient();
+          await ssrClient.auth.signInWithPassword({
             email,
             password,
           });
@@ -448,22 +449,28 @@ export async function loginUser(
   // Live Supabase Authentication
   if (isLiveSupabaseConfigured && password) {
     try {
+      const ssrClient = await createClient();
       const { data: authData, error: signInError } =
-        await supabase.auth.signInWithPassword({
+        await ssrClient.auth.signInWithPassword({
           email,
           password,
         });
 
       if (!signInError && authData.user) {
-        // Fetch role from users table
+        // Fetch role and details from users table
         let targetRole: "superadmin" | "admin" | "agent" | "customer" = "agent";
         try {
-          const dbClient = isAdminConfigured ? adminClient : supabase;
+          const dbClient = isAdminConfigured ? adminClient : ssrClient;
           const { data: userProfile } = await dbClient
             .from("users")
-            .select("role")
+            .select("role, is_active")
             .eq("id", authData.user.id)
             .maybeSingle();
+
+          if (userProfile && userProfile.is_active === false) {
+            await ssrClient.auth.signOut();
+            return { success: false, error: "This account has been deactivated." };
+          }
 
           if (userProfile?.role) {
             targetRole = userProfile.role;
@@ -489,6 +496,16 @@ export async function loginUser(
           redirect("/portal");
         } else {
           redirect("/agent");
+        }
+      } else if (signInError) {
+        // If Supabase returned an error and no mock match, return the exact Supabase error
+        const allTeam = [...AVAILABLE_AGENTS, ...getSharedTeamMembers()];
+        const mockMatch = allTeam.find((u) => u.email.toLowerCase() === email.toLowerCase());
+        if (!mockMatch) {
+          return {
+            success: false,
+            error: signInError.message || "Invalid email or password.",
+          };
         }
       }
     } catch (err: any) {
