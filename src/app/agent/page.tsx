@@ -23,7 +23,7 @@ export default async function AgentPage() {
   if (tickets.length === 0) {
     return (
       <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-100 font-sans">
-        <DeskHeader currentUser={currentUser} />
+        <DeskHeader currentUser={currentUser} brandName={currentUser.workspaceName || currentUser.company} />
         <main className="flex-1 overflow-y-auto p-6 md:p-10 flex items-center justify-center">
           <EmptyTicketsState className="max-w-lg w-full" />
         </main>

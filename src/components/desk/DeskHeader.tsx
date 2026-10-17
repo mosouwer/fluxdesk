@@ -19,6 +19,8 @@ interface DeskHeaderProps {
   onSearchChange?: (query: string) => void;
   onClearSearch?: () => void;
   currentUser?: User;
+  brandName?: string;
+  workspaceName?: string;
   onTicketCreated?: (ticket: Ticket) => void;
 }
 
@@ -29,12 +31,21 @@ export function DeskHeader({
   onSearchChange,
   onClearSearch,
   currentUser = CURRENT_AGENT,
+  brandName,
+  workspaceName,
   onTicketCreated,
 }: DeskHeaderProps) {
   const router = useRouter();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [localQuery, setLocalQuery] = useState("");
   const [isNewTicketOpen, setIsNewTicketOpen] = useState(false);
+
+  const displayBrandName =
+    brandName ||
+    workspaceName ||
+    currentUser?.workspaceName ||
+    currentUser?.company ||
+    (currentUser?.role === "superadmin" ? "Super Admin" : "FluxDesk");
 
   const isControlled = onSearchChange !== undefined;
   const currentQuery = isControlled ? (searchQuery ?? "") : localQuery;
@@ -103,8 +114,7 @@ export function DeskHeader({
 
         <div className="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-md px-2.5 py-1">
           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="font-semibold text-slate-900">Acme Cloud Technologies</span>
-          <span className="text-slate-400">/ Support Desk</span>
+          <span className="font-semibold text-slate-900">{displayBrandName}</span>
         </div>
 
         {/* Admin Panel button - Only visible to Admins */}

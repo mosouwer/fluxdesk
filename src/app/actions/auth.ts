@@ -103,6 +103,23 @@ export async function getCurrentSessionUser(): Promise<User | null> {
           // User is disabled/suspended
           return null;
         }
+
+        let wsName: string | undefined = undefined;
+        if (dbUser.workspace_id && isUuid(dbUser.workspace_id)) {
+          try {
+            const { data: ws } = await client
+              .from("workspaces")
+              .select("name")
+              .eq("id", dbUser.workspace_id)
+              .maybeSingle();
+            if (ws?.name) {
+              wsName = ws.name;
+            }
+          } catch {
+            // Workspace fetch fallback
+          }
+        }
+
         return {
           id: dbUser.id,
           name: dbUser.full_name || dbUser.email?.split("@")[0] || "User",
@@ -112,6 +129,8 @@ export async function getCurrentSessionUser(): Promise<User | null> {
           isActive: dbUser.is_active,
           workspaceId: dbUser.workspace_id,
           workspace_id: dbUser.workspace_id,
+          workspaceName: wsName,
+          company: wsName,
         };
       }
 
@@ -129,6 +148,23 @@ export async function getCurrentSessionUser(): Promise<User | null> {
           return null;
         }
         const wsId = authDbUser?.workspace_id || user.user_metadata?.workspace_id;
+
+        let wsName: string | undefined = undefined;
+        if (wsId && isUuid(wsId)) {
+          try {
+            const { data: ws } = await client
+              .from("workspaces")
+              .select("name")
+              .eq("id", wsId)
+              .maybeSingle();
+            if (ws?.name) {
+              wsName = ws.name;
+            }
+          } catch {
+            // Fallback
+          }
+        }
+
         return {
           id: user.id,
           name: authDbUser?.full_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
@@ -138,6 +174,8 @@ export async function getCurrentSessionUser(): Promise<User | null> {
           isActive: authDbUser?.is_active ?? true,
           workspaceId: wsId,
           workspace_id: wsId,
+          workspaceName: wsName,
+          company: wsName,
         };
       }
     } catch {

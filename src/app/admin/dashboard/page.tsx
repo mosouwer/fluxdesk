@@ -35,7 +35,7 @@ import { Avatar } from "@/components/ui/avatar";
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
-  const workspace = getActiveWorkspace();
+  let workspace = getActiveWorkspace();
 
   // 1. Verify user is an admin; show an access denied error otherwise
   const sessionUser = await getCurrentSessionUser();
@@ -86,6 +86,26 @@ export default async function AdminDashboardPage() {
             .maybeSingle();
           if (latestWs?.id) {
             adminWorkspaceId = latestWs.id;
+          }
+        }
+
+        if (adminWorkspaceId) {
+          const { data: wsRecord } = await client
+            .from("workspaces")
+            .select("*")
+            .eq("id", adminWorkspaceId)
+            .maybeSingle();
+          if (wsRecord) {
+            workspace = {
+              id: wsRecord.id,
+              name: wsRecord.name,
+              slug: wsRecord.slug,
+              brandColor: wsRecord.brand_color || "#2563eb",
+              welcomeTitle: wsRecord.welcome_title,
+              welcomeSubtitle: wsRecord.welcome_subtitle,
+              logoUrl: wsRecord.logo_url,
+              createdAt: wsRecord.created_at,
+            };
           }
         }
       }

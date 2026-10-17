@@ -17,6 +17,7 @@ export default async function CustomerPortalPage() {
   let customerName = CUSTOMER_EMILY.name;
   const activeWorkspace = getActiveWorkspace();
 
+  let portalBrandName = activeWorkspace.name;
   let tickets: Ticket[] = [];
 
   if (isLiveSupabaseConfigured) {
@@ -34,6 +35,28 @@ export default async function CustomerPortalPage() {
           user.user_metadata?.full_name ||
           customerEmail.split("@")[0] ||
           customerName;
+
+        let wsId = user.user_metadata?.workspace_id;
+        if (!wsId) {
+          const { data: userProfile } = await supabase
+            .from("users")
+            .select("workspace_id")
+            .eq("id", user.id)
+            .maybeSingle();
+          if (userProfile?.workspace_id) {
+            wsId = userProfile.workspace_id;
+          }
+        }
+        if (wsId) {
+          const { data: wsData } = await supabase
+            .from("workspaces")
+            .select("name")
+            .eq("id", wsId)
+            .maybeSingle();
+          if (wsData?.name) {
+            portalBrandName = wsData.name;
+          }
+        }
       }
     } catch {
       // Continue with default seed customer
@@ -123,7 +146,7 @@ export default async function CustomerPortalPage() {
             </div>
             <div>
               <span className="font-bold text-slate-900 tracking-tight text-base block leading-tight">
-                Acme Help Center
+                {portalBrandName}
               </span>
               <span className="text-[11px] text-slate-500 font-medium">
                 Customer Support Portal

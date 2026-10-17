@@ -335,6 +335,7 @@ export function AgentDeskClient({
         onSearchChange={handleSearchChange}
         onClearSearch={handleClearSearch}
         currentUser={currentUser}
+        brandName={currentUser?.workspaceName || currentUser?.company}
         onTicketCreated={(newTicket) => {
           setTickets((prev) => [newTicket, ...prev]);
           setSelectedTicketId(newTicket.id);

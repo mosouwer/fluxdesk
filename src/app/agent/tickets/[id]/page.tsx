@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getCurrentSessionUser } from "@/app/actions/auth";
 import { getTicketById } from "@/app/actions/tickets";
 import { TicketDetailClient } from "@/components/agent/TicketDetailClient";
 import { DeskHeader } from "@/components/desk/DeskHeader";
@@ -15,7 +16,10 @@ interface AgentTicketPageProps {
 
 export default async function AgentTicketDetailPage({ params }: AgentTicketPageProps) {
   const { id } = await params;
-  const ticket = await getTicketById(id);
+  const [ticket, currentUser] = await Promise.all([
+    getTicketById(id),
+    getCurrentSessionUser(),
+  ]);
 
   if (!ticket) {
     notFound();
@@ -24,7 +28,10 @@ export default async function AgentTicketDetailPage({ params }: AgentTicketPageP
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-100 font-sans">
       {/* Global Header */}
-      <DeskHeader />
+      <DeskHeader
+        currentUser={currentUser || undefined}
+        brandName={currentUser?.workspaceName || currentUser?.company}
+      />
 
       {/* Ticket Details Sub-Header */}
       <div className="bg-white px-5 py-2.5 border-b border-slate-200 flex items-center justify-between shrink-0 shadow-2xs">
