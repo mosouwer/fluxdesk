@@ -28,6 +28,7 @@ import { getCurrentSessionUser } from "@/app/actions/auth";
 import { AVAILABLE_AGENTS } from "@/data/mockDeskData";
 
 const SESSION_COOKIE_NAME = "fluxdesk_session_user";
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function safeRevalidatePath(path: string) {
   try {
@@ -452,19 +453,46 @@ export async function deleteUserAction(userId: string) {
   const isSuper = await checkIsSuperAdmin();
   if (!isSuper) throw new Error("UNAUTHORIZED");
 
+  if (userId === "u-superadmin-master-001") {
+    throw new Error("Cannot delete Platform Super Admin root account.");
+  }
+
+  // Remove from runtime shared store
   deleteSharedTeamMember(userId);
 
-  if (isAdminConfigured) {
+  if (isAdminConfigured || isLiveSupabaseConfigured) {
     try {
-      await adminClient.auth.admin.deleteUser(userId);
-      await adminClient.from("users").delete().eq("id", userId);
-      await adminClient.from("profiles").delete().eq("id", userId);
+      const db = isAdminConfigured ? adminClient : supabase;
+
+      // 1. Unassign tickets where this user was assigned to avoid foreign key errors
+      await db.from("tickets").update({ assigned_agent_id: null }).eq("assigned_agent_id", userId);
+
+      // 2. Remove workspace membership associations
+      await db.from("workspace_members").delete().eq("user_id", userId);
+
+      // 3. Delete from public.users table
+      await db.from("users").delete().eq("id", userId);
+
+      // 4. Delete from public.profiles table (if exists)
+      await db.from("profiles").delete().eq("id", userId);
+
+      // 5. Delete from Supabase Auth admin if adminClient is configured and userId is a valid UUID
+      if (isAdminConfigured && UUID_REGEX.test(userId)) {
+        try {
+          await adminClient.auth.admin.deleteUser(userId);
+        } catch (authErr: any) {
+          console.warn("deleteUser auth deletion warning:", authErr?.message);
+        }
+      }
     } catch (err: any) {
       console.warn("deleteUserAction DB warning:", err?.message);
+      throw new Error(err?.message || "Failed to delete user from database.");
     }
   }
 
   safeRevalidatePath("/super");
+  safeRevalidatePath("/admin/team");
+  safeRevalidatePath("/admin/dashboard");
   return { success: true };
 }
 
@@ -537,17 +565,42 @@ export async function deleteBusinessAction(workspaceId: string) {
   if (isAdminConfigured || isLiveSupabaseConfigured) {
     try {
       const db = isAdminConfigured ? adminClient : supabase;
-      // Cascade delete references to avoid foreign key errors
+
+      // 1. Delete all ticket messages belonging to this workspace
+      await db.from("ticket_messages").delete().eq("workspace_id", workspaceId);
+
+      // 2. Delete all tickets belonging to this workspace
       await db.from("tickets").delete().eq("workspace_id", workspaceId);
+
+      // 3. Delete macros belonging to this workspace
+      try {
+        await db.from("macros").delete().eq("workspace_id", workspaceId);
+      } catch {
+        // Table might be optional
+      }
+
+      // 4. Delete workspace members bindings
       await db.from("workspace_members").delete().eq("workspace_id", workspaceId);
-      await db.from("users").update({ workspace_id: null }).eq("workspace_id", workspaceId);
-      await db.from("workspaces").delete().eq("id", workspaceId);
+
+      // 5. Delete or unbind users associated exclusively with this workspace (except superadmins)
+      await db.from("users").delete().eq("workspace_id", workspaceId).neq("role", "superadmin");
+
+      // 6. Delete workspace record
+      const { error: wsDeleteError } = await db.from("workspaces").delete().eq("id", workspaceId);
+      if (wsDeleteError) {
+        console.warn("deleteBusinessAction workspace delete error:", wsDeleteError);
+        throw new Error(wsDeleteError.message);
+      }
     } catch (err: any) {
       console.warn("deleteBusinessAction DB warning:", err?.message);
+      throw new Error(err?.message || "Failed to delete business from database.");
     }
   }
 
   safeRevalidatePath("/super");
+  safeRevalidatePath("/admin/dashboard");
+  safeRevalidatePath("/admin/team");
+  safeRevalidatePath("/");
   return { success: true };
 }
 

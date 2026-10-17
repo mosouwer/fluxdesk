@@ -215,6 +215,45 @@ export function SuperAdminClient({ initialData }: SuperAdminClientProps) {
     });
   };
 
+  const handleDeleteBusiness = (workspaceId: string, businessName: string) => {
+    if (
+      !confirm(
+        `Are you sure you want to permanently delete brand "${businessName}"?\n\nThis action cannot be undone and will delete all associated tickets, messages, macros, and brand settings.`
+      )
+    ) {
+      return;
+    }
+
+    startTransition(async () => {
+      try {
+        await deleteBusinessAction(workspaceId);
+        setData((prev) => {
+          const removed = prev.businesses.find((b) => b.id === workspaceId);
+          return {
+            ...prev,
+            businesses: prev.businesses.filter((b) => b.id !== workspaceId),
+            users: prev.users.filter((u) => u.workspaceId !== workspaceId),
+            stats: {
+              ...prev.stats,
+              totalBusinesses: Math.max(0, prev.stats.totalBusinesses - 1),
+              activeBusinesses:
+                removed?.status === "active"
+                  ? Math.max(0, prev.stats.activeBusinesses - 1)
+                  : prev.stats.activeBusinesses,
+              suspendedBusinesses:
+                removed?.status === "suspended"
+                  ? Math.max(0, prev.stats.suspendedBusinesses - 1)
+                  : prev.stats.suspendedBusinesses,
+            },
+          };
+        });
+        showToast(`Brand "${businessName}" deleted permanently.`);
+      } catch (err: any) {
+        showToast(err?.message || "Failed to delete brand", "error");
+      }
+    });
+  };
+
   const handleSaveBusiness = () => {
     if (!editBusiness) return;
     startTransition(async () => {
@@ -577,6 +616,17 @@ export function SuperAdminClient({ initialData }: SuperAdminClientProps) {
                                 <Unlock className="h-3.5 w-3.5" />
                               )}
                             </button>
+
+                            {/* Delete Brand */}
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteBusiness(b.id, b.name)}
+                              disabled={isPending}
+                              title={`Permanently Delete Brand ${b.name}`}
+                              className="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-400 border border-transparent hover:border-rose-900/40 transition-colors cursor-pointer"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -747,10 +797,11 @@ export function SuperAdminClient({ initialData }: SuperAdminClientProps) {
                                 type="button"
                                 onClick={() => handleDeleteUser(u.id, u.email)}
                                 disabled={isPending}
-                                title="Delete User Permanently"
-                                className="h-7 w-7 rounded-lg bg-slate-850 hover:bg-rose-950 text-slate-400 hover:text-rose-400 flex items-center justify-center transition-colors cursor-pointer"
+                                title={`Delete User ${u.email} Permanently`}
+                                className="h-7 px-2 rounded-lg text-[11px] bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-400 border border-slate-700/50 hover:border-rose-800/60 flex items-center gap-1 transition-colors cursor-pointer"
                               >
                                 <Trash2 className="h-3 w-3" />
+                                <span className="hidden sm:inline">Delete</span>
                               </button>
                             )}
                           </div>
@@ -925,22 +976,38 @@ export function SuperAdminClient({ initialData }: SuperAdminClientProps) {
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setEditBusiness(null)}
-                className="border-slate-800 text-slate-300 text-xs"
+            <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => {
+                  const b = editBusiness;
+                  setEditBusiness(null);
+                  handleDeleteBusiness(b.id, b.name);
+                }}
+                disabled={isPending}
+                className="text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-950/60 border border-rose-900/40 rounded-xl px-3 py-1.5 flex items-center gap-1.5 transition-colors cursor-pointer"
               >
-                Cancel
-              </Button>
-              <Button
-                size="sm"
-                onClick={handleSaveBusiness}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs"
-              >
-                Save Changes
-              </Button>
+                <Trash2 className="h-3.5 w-3.5" />
+                <span>Delete Brand</span>
+              </button>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditBusiness(null)}
+                  className="border-slate-800 text-slate-300 text-xs"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleSaveBusiness}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs"
+                >
+                  Save Changes
+                </Button>
+              </div>
             </div>
           </div>
         </div>

@@ -123,6 +123,9 @@ export function deleteSharedWorkspace(workspaceId: string): boolean {
   const idx = workspaces.findIndex((w) => w.id === workspaceId);
   if (idx !== -1) {
     workspaces.splice(idx, 1);
+    if (globalThis.__FLUXDESK_ACTIVE_WORKSPACE__?.id === workspaceId) {
+      globalThis.__FLUXDESK_ACTIVE_WORKSPACE__ = workspaces[0] || INITIAL_WORKSPACE;
+    }
     return true;
   }
   return false;
