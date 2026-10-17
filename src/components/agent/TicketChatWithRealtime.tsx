@@ -233,35 +233,36 @@ export function TicketChatWithRealtime({
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-50 flex-1 min-w-0">
-      {/* Realtime Channel Connection Header */}
-      <div className="bg-slate-900 text-white px-4 py-1.5 flex items-center justify-between text-xs border-b border-slate-800 shrink-0">
-        <div className="flex items-center gap-2">
-          <span className="flex h-2 w-2 relative">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+    <div className="flex flex-col h-full bg-zinc-50/50 flex-1 min-w-0 relative">
+      {/* 1. Linear Header Bar: Sticky h-12 with backdrop blur, monospace ID, and realtime status */}
+      <div className="h-12 border-b border-zinc-200/80 px-4 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
+        <div className="flex items-center gap-2.5">
+          <span className="font-mono text-xs text-zinc-400">
+            #TICK-{ticketId.slice(0, 6)}
           </span>
-          <span className="font-semibold text-slate-200">
-            Realtime Presence:
-          </span>
-          <span className="font-mono text-emerald-400 text-[11px]">
-            ticket-presence-{ticketId.slice(0, 8)}...
+
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200/70 px-2 py-0.5 rounded-full">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+            </span>
+            Realtime Synced
           </span>
         </div>
 
         {/* Simulation toggle button */}
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-slate-400">Simulation:</span>
+          <span className="text-[11px] text-zinc-400 hidden sm:inline">Simulation:</span>
           <button
             type="button"
             onClick={() =>
               setSimulatedPeer(simulatedPeer ? null : "Agent David Kim")
             }
             className={cn(
-              "text-[10px] px-2 py-0.5 rounded font-semibold transition-colors",
+              "text-[11px] px-2.5 py-1 rounded-md font-medium transition-colors border",
               simulatedPeer
-                ? "bg-amber-500 text-amber-950 font-bold"
-                : "bg-slate-800 text-slate-400 hover:text-white"
+                ? "bg-amber-100 text-amber-900 border-amber-300 font-semibold"
+                : "bg-zinc-100 text-zinc-600 border-zinc-200 hover:text-zinc-900 hover:bg-zinc-200/70"
             )}
           >
             {simulatedPeer ? "Viewing: David Kim" : "Simulate Peer"}
@@ -271,30 +272,22 @@ export function TicketChatWithRealtime({
 
       {/* ALERT BANNER: Rendered when other agents are active on presence channel */}
       {effectivePeerAgents.length > 0 && (
-        <div className="bg-amber-500/10 border-b border-amber-300 px-4 py-2.5 text-xs text-amber-950 flex items-center justify-between shadow-2xs animate-in fade-in duration-150">
-          <div className="flex items-center gap-2.5">
-            <div className="h-6 w-6 rounded-md bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
-              <AlertTriangle className="h-3.5 w-3.5" />
-            </div>
-            <div>
-              <span className="font-bold inline-flex items-center gap-1.5">
-                <AlertTriangle className="h-3.5 w-3.5 text-amber-800 shrink-0 inline" />
-                <span>
-                  {effectivePeerAgents.map((a) => a.userName).join(", ")}{" "}
-                  is also viewing this ticket.
-                </span>
-              </span>
-              <span className="text-[11px] text-amber-800/90 ml-1.5 hidden sm:inline">
-                Coordinate to prevent duplicate replies.
-              </span>
-            </div>
+        <div className="bg-amber-50/70 border-b border-amber-200/70 px-4 py-2 text-xs text-amber-900 flex items-center justify-between animate-in fade-in duration-150">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-3.5 w-3.5 text-amber-700 shrink-0" />
+            <span className="font-medium">
+              {effectivePeerAgents.map((a) => a.userName).join(", ")} is also viewing this ticket.
+            </span>
+            <span className="text-[11px] text-amber-700/80 hidden sm:inline">
+              Coordinate to prevent duplicate replies.
+            </span>
           </div>
 
           <div className="flex items-center -space-x-1.5 overflow-hidden">
             {effectivePeerAgents.map((agent, i) => (
               <div
                 key={i}
-                className="h-6 w-6 rounded-full bg-amber-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-amber-900 shadow-2xs"
+                className="h-5 w-5 rounded-full bg-amber-200 border-2 border-white flex items-center justify-center text-[10px] font-semibold text-amber-900 shadow-2xs"
                 title={agent.userName}
               >
                 {agent.userName[0]}
@@ -304,8 +297,8 @@ export function TicketChatWithRealtime({
         </div>
       )}
 
-      {/* SCROLLABLE CONVERSATION THREAD */}
-      <div className="flex-1 overflow-y-auto p-5 space-y-4">
+      {/* 2. Scrollable Conversation Thread */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5">
         {messages.map((message) => {
           const isInternal = message.type === "internal_note";
           const isCustomer = message.sender?.role === "customer";
@@ -314,57 +307,47 @@ export function TicketChatWithRealtime({
             <div
               key={message.id}
               className={cn(
-                "rounded-xl transition-all shadow-xs border text-left overflow-hidden",
+                "rounded-xl p-4 transition-all text-left",
                 isInternal
-                  ? "bg-amber-50/90 border-amber-300 shadow-[0_1px_3px_rgba(245,158,11,0.08)]"
-                  : isCustomer
-                  ? "bg-white border-slate-200"
-                  : "bg-white border-blue-200/80 shadow-[0_1px_2px_rgba(37,99,235,0.04)]"
+                  ? "bg-amber-50/60 border border-amber-200/70"
+                  : "bg-white border border-zinc-200/80 shadow-2xs"
               )}
             >
               {/* Header */}
-              <div
-                className={cn(
-                  "px-4 py-2 flex items-center justify-between border-b text-xs",
-                  isInternal
-                    ? "bg-amber-100/70 border-amber-200 text-amber-900"
-                    : isCustomer
-                    ? "bg-slate-50/80 border-slate-100 text-slate-700"
-                    : "bg-blue-50/50 border-blue-100 text-slate-700"
-                )}
-              >
-                <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-zinc-100">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <Avatar
                     src={message.sender?.avatar}
                     fallback={message.sender?.name?.[0] || "A"}
                     size="sm"
+                    className="h-7 w-7 text-xs"
                   />
-                  <div>
-                    <span className="font-semibold text-slate-900">
+                  <div className="flex items-center gap-1.5 truncate">
+                    <span className="text-xs font-semibold text-zinc-900 truncate">
                       {message.sender?.name || "Staff"}
                     </span>
-                    <span className="text-[11px] text-slate-500 ml-1 font-normal">
-                      ({message.sender?.email || "staff@acmesupport.com"})
+                    <span className="text-[11px] text-zinc-400 hidden sm:inline">
+                      {message.sender?.email}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   {isInternal ? (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-900 bg-amber-200 border border-amber-300 px-2 py-0.5 rounded-full shadow-2xs">
-                      <Lock className="h-3 w-3 text-amber-900" />
-                      Internal Note (Private)
+                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-800 bg-amber-100/70 border border-amber-200 px-2 py-0.5 rounded-full">
+                      <Lock className="h-3 w-3 text-amber-700" />
+                      Internal Note
                     </span>
                   ) : isCustomer ? (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 bg-slate-200/60 px-2 py-0.5 rounded-full">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-600 bg-zinc-100 px-2 py-0.5 rounded-full">
                       Requester
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-700 bg-blue-50 border border-blue-200/60 px-2 py-0.5 rounded-full">
                       Public Reply
                     </span>
                   )}
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-zinc-400">
                     {message.createdAt}
                   </span>
                 </div>
@@ -373,20 +356,20 @@ export function TicketChatWithRealtime({
               {/* Message Body */}
               <div
                 className={cn(
-                  "p-4 text-xs leading-relaxed whitespace-pre-wrap font-sans",
-                  isInternal ? "text-amber-950 font-normal" : "text-slate-800"
+                  "text-xs leading-relaxed whitespace-pre-wrap font-sans",
+                  isInternal ? "text-amber-950 font-normal" : "text-zinc-800"
                 )}
               >
                 {message.body}
 
                 {message.attachments && message.attachments.length > 0 && (
-                  <div className="mt-3 pt-2 border-t border-slate-200/60 flex flex-wrap gap-2">
+                  <div className="mt-3 pt-2.5 border-t border-zinc-100 flex flex-wrap gap-2">
                     {message.attachments.map((att, i) => (
                       <div
                         key={i}
-                        className="inline-flex items-center gap-1.5 text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md border border-slate-200"
+                        className="inline-flex items-center gap-1.5 text-xs bg-zinc-50 text-zinc-700 px-2.5 py-1 rounded-md border border-zinc-200/80"
                       >
-                        <FileText className="h-3.5 w-3.5 text-blue-500" />
+                        <FileText className="h-3.5 w-3.5 text-zinc-500" />
                         <span className="font-mono text-[11px]">{att.filename}</span>
                       </div>
                     ))}
@@ -399,22 +382,22 @@ export function TicketChatWithRealtime({
         <div ref={threadEndRef} />
       </div>
 
-      {/* 3. REPLY BOX WITH TOGGLE TABS (Public Reply vs. Yellow Internal Note) */}
-      <div className="p-4 bg-white border-t border-slate-200 shrink-0 shadow-md">
+      {/* 3. Floating Reply Composer */}
+      <div className="m-4 bg-white border border-zinc-200 rounded-xl shadow-sm focus-within:ring-2 focus-within:ring-zinc-900/10 focus-within:border-zinc-400 transition-all overflow-hidden shrink-0">
         {/* Toggle Tabs */}
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+        <div className="px-3 pt-3 pb-2 flex items-center justify-between border-b border-zinc-100">
+          <div className="flex items-center gap-1 bg-zinc-100 p-0.5 rounded-lg border border-zinc-200/80">
             <button
               type="button"
               onClick={() => setReplyType("public_reply")}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md transition-all",
+                "flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-all",
                 replyType === "public_reply"
-                  ? "bg-white text-blue-700 shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-white text-zinc-900 font-semibold shadow-2xs"
+                  : "text-zinc-500 hover:text-zinc-900"
               )}
             >
-              <MessageSquare className="h-3.5 w-3.5 text-blue-600" />
+              <MessageSquare className="h-3 w-3" />
               <span>Public Reply</span>
             </button>
 
@@ -422,110 +405,86 @@ export function TicketChatWithRealtime({
               type="button"
               onClick={() => setReplyType("internal_note")}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md transition-all",
+                "flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-all",
                 replyType === "internal_note"
-                  ? "bg-amber-400 text-amber-950 shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-amber-100/80 text-amber-900 font-semibold shadow-2xs border border-amber-200/70"
+                  : "text-zinc-500 hover:text-zinc-900"
               )}
             >
-              <Lock className="h-3.5 w-3.5 text-amber-900" />
+              <Lock className="h-3 w-3 text-amber-700" />
               <span>Internal Note</span>
             </button>
           </div>
 
-          <div className="text-[11px] text-slate-400 flex items-center gap-1">
+          <div className="text-[11px] text-zinc-400 flex items-center gap-1.5">
             <Radio className="h-3 w-3 text-emerald-500" />
-            <span>Supabase Realtime Synced</span>
+            <span>Realtime Synced</span>
           </div>
         </div>
 
-        {/* Textarea container with styled yellow background for Internal Note */}
-        <div
-          className={cn(
-            "rounded-lg border transition-all focus-within:ring-2",
-            replyType === "internal_note"
-              ? "bg-[#fffdf5] border-amber-300 focus-within:ring-amber-400 focus-within:border-amber-400"
-              : "bg-white border-slate-300 focus-within:ring-blue-500 focus-within:border-blue-500"
-          )}
-        >
-          {/* Internal Note Banner Warning */}
-          {replyType === "internal_note" && (
-            <div className="px-3 py-1 bg-amber-100/80 border-b border-amber-200 text-[11px] font-semibold text-amber-900 flex items-center justify-between">
-              <span className="flex items-center gap-1.5">
-                <Lock className="h-3 w-3 text-amber-800" />
-                Internal Note: Visible ONLY to support agents and admins
-              </span>
-              <span className="text-[10px] text-amber-700 font-normal">
-                Customer will never receive or see this
-              </span>
-            </div>
-          )}
-
-          <textarea
-            ref={textareaRef}
-            rows={4}
-            value={replyBody}
-            onChange={(e) => setReplyBody(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={
-              replyType === "internal_note"
-                ? "Write a private internal note for your team... (Press Cmd+Enter to post)"
-                : "Type your public reply to the customer... (Press Cmd+Enter to send)"
-            }
-            className={cn(
-              "w-full p-3 text-xs focus:outline-none resize-none bg-transparent placeholder:text-slate-400",
-              replyType === "internal_note"
-                ? "text-amber-950 font-medium"
-                : "text-slate-800"
-            )}
-          />
-
-          {/* Action Footer */}
-          <div
-            className={cn(
-              "px-3 py-2 flex items-center justify-between border-t",
-              replyType === "internal_note"
-                ? "border-amber-200 bg-amber-50/40"
-                : "border-slate-100 bg-slate-50/50"
-            )}
-          >
-            {/* Keyboard shortcut indicator */}
-            <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
-              <span className="text-slate-400">Press</span>
-              <kbd className="bg-white border border-slate-300 text-slate-700 px-1.5 py-0.5 rounded font-mono text-[10px] shadow-2xs font-semibold">
-                ⌘
-              </kbd>
-              <span className="text-slate-400">+</span>
-              <kbd className="bg-white border border-slate-300 text-slate-700 px-1.5 py-0.5 rounded font-mono text-[10px] shadow-2xs font-semibold">
-                Enter
-              </kbd>
-              <span className="text-slate-400">to send</span>
-            </div>
-
-            <Button
-              type="button"
-              onClick={handleSend}
-              disabled={!replyBody.trim() || isSubmitting}
-              className={cn(
-                "h-8 text-xs font-semibold gap-1.5",
-                replyType === "internal_note"
-                  ? "bg-amber-600 hover:bg-amber-700 text-white"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
-              )}
-            >
-              {replyType === "internal_note" ? (
-                <>
-                  <Lock className="h-3 w-3" />
-                  <span>Post Internal Note</span>
-                </>
-              ) : (
-                <>
-                  <CornerDownLeft className="h-3 w-3" />
-                  <span>Send Reply</span>
-                </>
-              )}
-            </Button>
+        {/* Internal Note Banner Warning */}
+        {replyType === "internal_note" && (
+          <div className="px-3.5 py-1.5 bg-amber-50/70 border-b border-amber-200/60 text-[11px] font-medium text-amber-900 flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <Lock className="h-3 w-3 text-amber-700" />
+              Internal Note: Only visible to support team
+            </span>
+            <span className="text-[10px] text-amber-600">
+              Hidden from customer
+            </span>
           </div>
+        )}
+
+        <textarea
+          ref={textareaRef}
+          rows={3}
+          value={replyBody}
+          onChange={(e) => setReplyBody(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={
+            replyType === "internal_note"
+              ? "Leave a note for your team... (Press Cmd+Enter to post)"
+              : "Type your reply to the customer... (Press Cmd+Enter to send)"
+          }
+          className={cn(
+            "w-full p-3.5 text-xs focus:outline-none resize-none bg-transparent placeholder:text-zinc-400 font-sans",
+            replyType === "internal_note"
+              ? "text-amber-950 font-medium"
+              : "text-zinc-900"
+          )}
+        />
+
+        {/* Clean Footer Inside Composer */}
+        <div className="px-3.5 py-2.5 flex items-center justify-between border-t border-zinc-100 bg-zinc-50/40">
+          {/* Keyboard hint badge */}
+          <div className="flex items-center gap-1 text-[11px] text-zinc-400">
+            <kbd className="px-1.5 py-0.5 text-[10px] bg-zinc-100 border border-zinc-200 rounded text-zinc-500 font-mono">
+              ⌘
+            </kbd>
+            <span>+</span>
+            <kbd className="px-1.5 py-0.5 text-[10px] bg-zinc-100 border border-zinc-200 rounded text-zinc-500 font-mono">
+              Enter
+            </kbd>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSend}
+            disabled={!replyBody.trim() || isSubmitting}
+            className="bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 text-white text-xs px-3 py-1.5 rounded-lg font-medium inline-flex items-center gap-1.5 transition-colors shadow-2xs"
+          >
+            {replyType === "internal_note" ? (
+              <>
+                <Lock className="h-3 w-3 text-amber-300" />
+                <span>Post Note</span>
+              </>
+            ) : (
+              <>
+                <CornerDownLeft className="h-3 w-3" />
+                <span>Send</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>

@@ -133,12 +133,12 @@ export function LeftColumn({
   };
 
   return (
-    <aside className="w-80 border-r border-slate-200 bg-white flex flex-col h-full shrink-0 select-none">
+    <aside className="w-60 border-r border-zinc-200/80 bg-zinc-50/80 flex flex-col h-full shrink-0 select-none">
       {/* Upper Section: Views List */}
-      <div className="p-3 border-b border-slate-200 bg-slate-50/50">
-        <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-2 mb-2 flex items-center justify-between">
+      <div className="p-2.5 border-b border-zinc-200/80">
+        <div className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 px-2 mb-1.5 flex items-center justify-between">
           <span>Views</span>
-          <Filter className="h-3 w-3 text-slate-400" />
+          <Filter className="h-3 w-3 text-zinc-400" />
         </div>
         <nav className="space-y-0.5">
           {viewsConfig.map((view) => {
@@ -149,25 +149,26 @@ export function LeftColumn({
                 key={view.id}
                 onClick={() => onSelectView(view.id)}
                 className={cn(
-                  "w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors text-left",
+                  "w-full h-8 flex items-center justify-between px-2.5 rounded-md text-xs font-medium transition-colors text-left",
                   isActive
-                    ? "bg-blue-50 text-blue-900 font-semibold shadow-xs"
-                    : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                    ? "bg-zinc-200/70 text-zinc-900 font-semibold"
+                    : "text-zinc-600 hover:bg-zinc-200/40 hover:text-zinc-900"
                 )}
               >
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2 truncate">
                   <Icon
                     className={cn(
-                      "h-4 w-4",
-                      isActive ? "text-blue-600" : "text-slate-400"
+                      "h-3.5 w-3.5 shrink-0",
+                      isActive ? "text-zinc-900" : "text-zinc-400"
                     )}
                   />
-                  <span>{view.label}</span>
+                  <span className="truncate">{view.label}</span>
                 </div>
                 <span
                   className={cn(
-                    "text-[10px] px-1.5 py-0.5 rounded-full font-semibold",
-                    view.countColor
+                    "tabular-nums text-[11px]",
+                    isActive ? "text-zinc-800 font-semibold" : "text-zinc-500",
+                    view.id === "sla_breached" && view.count > 0 && "text-red-600 font-bold"
                   )}
                 >
                   {view.count}
@@ -179,21 +180,21 @@ export function LeftColumn({
       </div>
 
       {/* Search within filtered list */}
-      <div className="p-2.5 border-b border-slate-100 bg-white">
+      <div className="p-2 border-b border-zinc-200/60 bg-transparent">
         <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
           <input
             type="text"
             value={ticketSearch}
             onChange={(e) => setTicketSearch(e.target.value)}
-            placeholder="Search ticket #, owner, customer..."
-            className="w-full h-7 pl-8 pr-7 text-xs bg-slate-50 border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white text-slate-800 placeholder:text-slate-400"
+            placeholder="Search tickets..."
+            className="w-full h-7 pl-8 pr-7 text-xs bg-white/80 border border-zinc-200/80 rounded-md focus:outline-none focus:ring-1 focus:ring-zinc-400 focus:bg-white text-zinc-800 placeholder:text-zinc-400"
           />
           {ticketSearch && (
             <button
               type="button"
               onClick={() => setTicketSearch("")}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 p-0.5 rounded"
               title="Clear search"
             >
               <X className="h-3 w-3" />
@@ -203,29 +204,29 @@ export function LeftColumn({
       </div>
 
       {/* Ticket List header */}
-      <div className="px-3 py-1.5 bg-slate-50 text-[10px] font-medium text-slate-500 uppercase tracking-wider flex items-center justify-between border-b border-slate-100">
+      <div className="px-3 py-1.5 bg-zinc-100/50 text-[10px] font-semibold text-zinc-400 uppercase tracking-wider flex items-center justify-between border-b border-zinc-200/60">
         <span>{filteredTickets.length} Tickets</span>
         <div className="flex items-center gap-2">
-          <span>Sorted by Newest</span>
+          <span>Newest</span>
           {onRefresh && (
             <button
               type="button"
               onClick={onRefresh}
               disabled={isRefreshing}
               title="Refresh tickets"
-              className="text-slate-400 hover:text-blue-600 transition-colors p-0.5 rounded hover:bg-slate-200/60 disabled:opacity-50"
+              className="text-zinc-400 hover:text-zinc-700 transition-colors p-0.5 rounded hover:bg-zinc-200/60 disabled:opacity-50"
             >
-              <RefreshCw className={cn("h-3 w-3", isRefreshing && "animate-spin text-blue-600")} />
+              <RefreshCw className={cn("h-3 w-3", isRefreshing && "animate-spin text-zinc-700")} />
             </button>
           )}
         </div>
       </div>
 
       {/* Tickets Scrollable List */}
-      <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
+      <div className="flex-1 overflow-y-auto divide-y divide-zinc-200/60 bg-white/40">
         {filteredTickets.length === 0 ? (
-          <div className="p-8 text-center text-slate-400 text-xs">
-            <Inbox className="h-8 w-8 mx-auto mb-2 text-slate-300" />
+          <div className="p-8 text-center text-zinc-400 text-xs">
+            <Inbox className="h-8 w-8 mx-auto mb-2 text-zinc-300" />
             No tickets match this view.
           </div>
         ) : (
@@ -238,16 +239,16 @@ export function LeftColumn({
                 key={ticket.id}
                 onClick={() => onSelectTicket(ticket.id)}
                 className={cn(
-                  "p-3 cursor-pointer transition-colors relative border-l-3 text-left",
+                  "p-2.5 cursor-pointer transition-colors relative border-l-2 text-left",
                   isSelected
-                    ? "bg-blue-50/70 border-l-blue-600 shadow-2xs"
-                    : "border-l-transparent hover:bg-slate-50"
+                    ? "bg-zinc-200/60 border-l-zinc-900 shadow-2xs"
+                    : "border-l-transparent hover:bg-zinc-100/60"
                 )}
               >
                 {/* Header row: Ticket number, Status, and Priority */}
                 <div className="flex items-center justify-between gap-1 mb-1">
                   <div className="flex items-center gap-1.5">
-                    <span className="font-mono text-xs font-semibold text-slate-500">
+                    <span className="font-mono text-xs text-zinc-400">
                       #{ticket.number}
                     </span>
                     <StatusBadge status={ticket.status} />
@@ -259,13 +260,13 @@ export function LeftColumn({
                 </div>
 
                 {/* Subject */}
-                <h4 className="text-xs font-semibold text-slate-900 line-clamp-1 mb-1">
+                <h4 className="text-xs font-semibold text-zinc-900 line-clamp-1 mb-1">
                   {ticket.subject}
                 </h4>
 
                 {/* Footer row: Requester & SLA/Timestamp */}
-                <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
-                  <span className="truncate max-w-[130px] font-medium text-slate-700">
+                <div className="flex items-center justify-between text-[11px] text-zinc-500 mt-1">
+                  <span className="truncate max-w-[110px] font-medium text-zinc-700">
                     {ticket.customer.name}
                   </span>
 
@@ -276,7 +277,7 @@ export function LeftColumn({
                         Breached
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-0.5 text-[10px] text-slate-400">
+                      <span className="inline-flex items-center gap-0.5 text-[10px] text-zinc-400">
                         <Clock className="h-2.5 w-2.5" />
                         {ticket.slaDueMinutes}m
                       </span>

@@ -41,7 +41,7 @@ export default async function AgentTicketDetailPage({ params }: AgentTicketPageP
   }));
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-100 font-sans">
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-zinc-50/50 font-sans">
       {/* Global Header */}
       <DeskHeader
         currentUser={currentUser || undefined}

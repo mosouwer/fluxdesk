@@ -75,11 +75,11 @@ export function RightColumn({
   };
 
   return (
-    <aside className="w-80 border-l border-slate-200 bg-white flex flex-col h-full shrink-0 overflow-y-auto text-left select-none">
+    <aside className="w-72 border-l border-zinc-200/80 bg-zinc-50/40 p-4 space-y-6 flex flex-col h-full shrink-0 overflow-y-auto text-left select-none">
       {/* 1. Customer Metadata Section */}
-      <div className="p-4 border-b border-slate-200 bg-slate-50/40">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
             Customer Profile
           </span>
           {customer.tier && (
@@ -93,20 +93,20 @@ export function RightColumn({
         </div>
 
         {/* Customer Header */}
-        <div className="flex items-start gap-3 mb-3">
+        <div className="flex items-start gap-3 bg-white p-3 rounded-xl border border-zinc-200/80 shadow-2xs">
           <Avatar
             src={customer.avatar}
             fallback={customer.name[0]}
             size="md"
-            className="ring-2 ring-slate-100"
+            className="ring-2 ring-zinc-100"
           />
           <div className="min-w-0 flex-1">
-            <h3 className="text-xs font-bold text-slate-900 truncate">
+            <h3 className="text-xs font-semibold text-zinc-900 truncate">
               {customer.name}
             </h3>
             {customer.company && (
-              <p className="text-[11px] text-slate-500 truncate flex items-center gap-1 mt-0.5">
-                <Building className="h-3 w-3 text-slate-400 shrink-0" />
+              <p className="text-[11px] text-zinc-500 truncate flex items-center gap-1 mt-0.5">
+                <Building className="h-3 w-3 text-zinc-400 shrink-0" />
                 <span>{customer.company}</span>
               </p>
             )}
@@ -114,19 +114,19 @@ export function RightColumn({
         </div>
 
         {/* Email & Contact Rows */}
-        <div className="space-y-2 text-xs text-slate-600 bg-white p-2.5 rounded-lg border border-slate-200/80 shadow-2xs">
+        <div className="space-y-2 text-xs text-zinc-600 bg-white p-3 rounded-xl border border-zinc-200/80 shadow-2xs">
           {/* Email with copy */}
           <div className="flex items-center justify-between gap-1">
             <div className="flex items-center gap-2 truncate">
-              <Mail className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-              <span className="truncate text-[11px] text-slate-800 font-mono">
+              <Mail className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
+              <span className="truncate text-[11px] text-zinc-800 font-mono">
                 {customer.email}
               </span>
             </div>
             <button
               onClick={handleCopyEmail}
               title="Copy Email"
-              className="h-5 w-5 rounded hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors shrink-0"
+              className="h-5 w-5 rounded hover:bg-zinc-100 flex items-center justify-center text-zinc-400 hover:text-zinc-700 transition-colors shrink-0"
             >
               {copiedEmail ? (
                 <Check className="h-3 w-3 text-emerald-600" />
@@ -139,35 +139,35 @@ export function RightColumn({
           {/* Phone */}
           {customer.phone && (
             <div className="flex items-center gap-2 text-[11px]">
-              <Phone className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-              <span className="text-slate-700 font-mono">{customer.phone}</span>
+              <Phone className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
+              <span className="text-zinc-700 font-mono">{customer.phone}</span>
             </div>
           )}
 
           {/* Timezone */}
           {customer.timezone && (
             <div className="flex items-center gap-2 text-[11px]">
-              <Clock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-              <span className="text-slate-600">{customer.timezone}</span>
+              <Clock className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
+              <span className="text-zinc-600">{customer.timezone}</span>
             </div>
           )}
         </div>
 
         {/* Ticket History Stats */}
-        <div className="grid grid-cols-2 gap-2 mt-3 text-center">
-          <div className="bg-white p-2 rounded-lg border border-slate-200/80">
-            <div className="text-sm font-bold text-slate-900">
+        <div className="grid grid-cols-2 gap-2 text-center">
+          <div className="bg-white p-2.5 rounded-xl border border-zinc-200/80">
+            <div className="text-sm font-bold text-zinc-900 font-mono">
               {customer.lifetimeTickets ?? 1}
             </div>
-            <div className="text-[10px] text-slate-500 font-medium">
+            <div className="text-[10px] text-zinc-400 font-medium mt-0.5">
               Lifetime Tickets
             </div>
           </div>
-          <div className="bg-white p-2 rounded-lg border border-slate-200/80">
-            <div className="text-sm font-bold text-blue-600">
+          <div className="bg-white p-2.5 rounded-xl border border-zinc-200/80">
+            <div className="text-sm font-bold text-zinc-900 font-mono">
               {customer.openTickets ?? 1}
             </div>
-            <div className="text-[10px] text-slate-500 font-medium">
+            <div className="text-[10px] text-zinc-400 font-medium mt-0.5">
               Open Tickets
             </div>
           </div>
@@ -175,20 +175,20 @@ export function RightColumn({
       </div>
 
       {/* 2. Ticket Properties & Assignment Section */}
-      <div className="p-4 space-y-4 flex-1">
-        <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+      <div className="space-y-4">
+        <div className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
           Ticket Properties
         </div>
 
         {/* Assignee Control */}
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
+          <div className="flex items-center justify-between text-xs font-medium text-zinc-700">
             <span>Assignee</span>
             {ticket.assignedAgent?.id !== currentUser.id && (
               <button
                 type="button"
                 onClick={() => onUpdateTicket({ assignedAgent: currentUser })}
-                className="text-[11px] text-blue-600 hover:text-blue-800 font-medium hover:underline"
+                className="text-[11px] text-zinc-900 hover:text-zinc-700 font-semibold hover:underline"
               >
                 Assign to me
               </button>
@@ -207,7 +207,7 @@ export function RightColumn({
                   if (agent) onUpdateTicket({ assignedAgent: agent });
                 }
               }}
-              className="w-full h-8 pl-3 pr-8 text-xs bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 appearance-none font-medium cursor-pointer shadow-2xs"
+              className="w-full h-8 pl-3 pr-8 text-xs bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-zinc-400 text-zinc-900 appearance-none font-medium cursor-pointer shadow-2xs"
             >
               <option value="unassigned">— Unassigned —</option>
               {effectiveAgents.map((agent) => (
@@ -216,13 +216,13 @@ export function RightColumn({
                 </option>
               ))}
             </select>
-            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400 pointer-events-none" />
           </div>
         </div>
 
         {/* Status Control */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-slate-700 block">
+          <label className="text-xs font-medium text-zinc-700 block">
             Status
           </label>
           <div className="relative">
@@ -231,7 +231,7 @@ export function RightColumn({
               onChange={(e) =>
                 onUpdateTicket({ status: e.target.value as TicketStatus })
               }
-              className="w-full h-8 pl-3 pr-8 text-xs bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 appearance-none font-medium cursor-pointer shadow-2xs"
+              className="w-full h-8 pl-3 pr-8 text-xs bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-zinc-400 text-zinc-900 appearance-none font-medium cursor-pointer shadow-2xs"
             >
               <option value="open">Open</option>
               <option value="pending">Pending</option>
@@ -239,13 +239,13 @@ export function RightColumn({
               <option value="solved">Solved</option>
               <option value="closed">Closed</option>
             </select>
-            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400 pointer-events-none" />
           </div>
         </div>
 
         {/* Priority Control */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-slate-700 block">
+          <label className="text-xs font-medium text-zinc-700 block">
             Priority
           </label>
           <div className="relative">
@@ -254,39 +254,39 @@ export function RightColumn({
               onChange={(e) =>
                 onUpdateTicket({ priority: e.target.value as TicketPriority })
               }
-              className="w-full h-8 pl-3 pr-8 text-xs bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 appearance-none font-medium cursor-pointer shadow-2xs"
+              className="w-full h-8 pl-3 pr-8 text-xs bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-zinc-400 text-zinc-900 appearance-none font-medium cursor-pointer shadow-2xs"
             >
               <option value="urgent">Urgent</option>
               <option value="high">High</option>
               <option value="normal">Normal</option>
               <option value="low">Low</option>
             </select>
-            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400 pointer-events-none" />
           </div>
         </div>
 
         {/* Channel display */}
         <div className="space-y-1">
-          <label className="text-[11px] font-semibold text-slate-500 block">
+          <label className="text-[11px] font-medium text-zinc-400 block">
             Originating Channel
           </label>
-          <div className="text-xs font-medium text-slate-700 bg-slate-100/70 border border-slate-200 px-3 py-1.5 rounded-md capitalize">
+          <div className="text-xs font-medium text-zinc-700 bg-zinc-100/70 border border-zinc-200/80 px-3 py-1.5 rounded-lg capitalize">
             {ticket.channel} Support
           </div>
         </div>
 
         {/* Tags Control */}
-        <div className="space-y-2 pt-1 border-t border-slate-100">
-          <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
+        <div className="space-y-2 pt-2 border-t border-zinc-200/60">
+          <div className="flex items-center justify-between text-xs font-medium text-zinc-700">
             <span className="flex items-center gap-1.5">
-              <Tag className="h-3 w-3 text-slate-400" />
+              <Tag className="h-3 w-3 text-zinc-400" />
               <span>Tags</span>
             </span>
             {!isAddingTag && (
               <button
                 type="button"
                 onClick={() => setIsAddingTag(true)}
-                className="text-[11px] text-blue-600 hover:text-blue-800 font-medium flex items-center gap-0.5"
+                className="text-[11px] text-zinc-900 hover:text-zinc-600 font-semibold flex items-center gap-0.5"
               >
                 <Plus className="h-3 w-3" />
                 Add
@@ -299,13 +299,13 @@ export function RightColumn({
             {ticket.tags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center gap-1 text-[11px] bg-slate-100 text-slate-700 font-mono px-2 py-0.5 rounded-md border border-slate-200 group"
+                className="inline-flex items-center gap-1 text-[11px] bg-zinc-100 text-zinc-700 font-mono px-2 py-0.5 rounded-md border border-zinc-200 group"
               >
                 <span>{tag}</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveTag(tag)}
-                  className="hover:text-red-600 rounded-sm"
+                  className="hover:text-red-600 rounded-xs"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -322,9 +322,9 @@ export function RightColumn({
                 onChange={(e) => setNewTagInput(e.target.value)}
                 placeholder="tag-name..."
                 autoFocus
-                className="flex-1 h-7 text-xs px-2 border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="flex-1 h-7 text-xs px-2 bg-white border border-zinc-300 rounded-md focus:outline-none focus:ring-1 focus:ring-zinc-500"
               />
-              <Button type="submit" size="sm" className="h-7 px-2 text-xs">
+              <Button type="submit" size="sm" className="h-7 px-2 text-xs bg-zinc-900 hover:bg-zinc-800 text-white">
                 Save
               </Button>
               <Button
@@ -332,7 +332,7 @@ export function RightColumn({
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsAddingTag(false)}
-                className="h-7 px-1.5 text-xs text-slate-400"
+                className="h-7 px-1.5 text-xs text-zinc-400 hover:text-zinc-700"
               >
                 <X className="h-3.5 w-3.5" />
               </Button>
