@@ -19,6 +19,7 @@ import {
 import { Ticket, TicketMessage, TicketPriority, User as UserType } from "@/types/desk";
 import { CUSTOMER_EMILY, CUSTOMER_MARCUS } from "@/data/mockDeskData";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge, PriorityBadge } from "@/components/ui/badges";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { submitNewTicket, addMessageReply } from "@/app/actions/tickets";
@@ -525,12 +526,8 @@ export function CustomerPortalClient({ initialTickets }: CustomerPortalClientPro
                         <span className="font-mono text-xs font-bold text-slate-500">
                           #{ticket.number}
                         </span>
-                        <Badge variant={ticket.status} className="text-[10px] px-1.5 py-0 h-4 uppercase">
-                          {ticket.status}
-                        </Badge>
-                        <Badge variant={ticket.priority} className="text-[10px] px-1.5 py-0 h-4">
-                          {ticket.priority}
-                        </Badge>
+                        <StatusBadge status={ticket.status} />
+                        <PriorityBadge priority={ticket.priority} />
                       </div>
 
                       <h4 className="text-xs font-semibold text-slate-900 truncate">
@@ -573,9 +570,7 @@ export function CustomerPortalClient({ initialTickets }: CustomerPortalClientPro
                       #{activeTicket.number}
                     </span>
                     {/* Read-Only Status Badge for Customers: Cannot change to solved */}
-                    <Badge variant={activeTicket.status} className="text-xs uppercase">
-                      Status: {activeTicket.status}
-                    </Badge>
+                    <StatusBadge status={activeTicket.status} />
                   </div>
 
                   <span className="text-[11px] text-slate-500 font-medium flex items-center gap-1">

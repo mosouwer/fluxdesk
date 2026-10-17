@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   XCircle,
+  X,
   RefreshCw,
   Search,
   ExternalLink,
@@ -876,7 +877,7 @@ export function SuperAdminClient({ initialData }: SuperAdminClientProps) {
                 onClick={() => setEditBusiness(null)}
                 className="text-slate-400 hover:text-white"
               >
-                ✕
+                <X className="h-4 w-4" />
               </button>
             </div>
 

@@ -7,6 +7,7 @@ import { getTeamMembers } from "@/app/actions/team";
 import { TicketDetailClient } from "@/components/agent/TicketDetailClient";
 import { DeskHeader } from "@/components/desk/DeskHeader";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge, PriorityBadge } from "@/components/ui/badges";
 import { ArrowLeft, Clock, Globe } from "lucide-react";
 import { User } from "@/types/desk";
 
@@ -64,12 +65,8 @@ export default async function AgentTicketDetailPage({ params }: AgentTicketPageP
             <span className="font-mono text-xs font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
               #{ticket.number}
             </span>
-            <Badge variant={ticket.status} className="text-xs uppercase">
-              {ticket.status}
-            </Badge>
-            <Badge variant={ticket.priority} className="text-xs capitalize">
-              {ticket.priority}
-            </Badge>
+            <StatusBadge status={ticket.status} />
+            <PriorityBadge priority={ticket.priority} />
           </div>
 
           <h1 className="text-sm font-bold text-slate-900 truncate max-w-lg">

@@ -52,6 +52,10 @@ const config: Config = {
           badge: "#fef08a",
         },
       },
+      fontFamily: {
+        sans: ["var(--font-geist-sans)", "Inter", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "monospace"],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

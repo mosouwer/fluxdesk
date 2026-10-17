@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Plus, LayoutTemplate, Globe } from "lucide-react";
+import { Plus, LayoutTemplate, Globe, Inbox } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface EmptyTicketsStateProps {
@@ -24,10 +24,8 @@ export function EmptyTicketsState({
     <div
       className={`bg-white rounded-2xl border border-slate-200/90 p-12 text-center text-slate-500 shadow-2xs flex flex-col items-center justify-center ${className}`}
     >
-      <div className="h-16 w-16 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center mx-auto mb-4 shadow-2xs select-none">
-        <span className="text-3xl leading-none" role="img" aria-label="inbox">
-          📥
-        </span>
+      <div className="h-14 w-14 rounded-2xl bg-zinc-100 text-zinc-600 border border-zinc-200/60 flex items-center justify-center mx-auto mb-4 shadow-2xs select-none">
+        <Inbox className="h-6 w-6 text-zinc-600 stroke-[1.75]" />
       </div>
       <h3 className="text-base font-bold text-slate-900 tracking-tight">
         No tickets found

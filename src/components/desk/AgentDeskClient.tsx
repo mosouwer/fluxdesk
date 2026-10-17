@@ -15,7 +15,7 @@ import { Ticket, DeskView, MessageType, TicketStatus, Macro, TicketMessage, User
 import { useTicketRealtime } from "@/hooks/useTicketRealtime";
 import { addMessageReply, updateTicketStatus, getAgentTickets } from "@/app/actions/tickets";
 import { getTeamMembers } from "@/app/actions/team";
-import { CheckCircle2, Lock, Zap, Radio } from "lucide-react";
+import { CheckCircle2, Lock, Zap, Radio, AlertTriangle } from "lucide-react";
 
 interface AgentDeskClientProps {
   initialTickets: Ticket[];
@@ -356,10 +356,10 @@ export function AgentDeskClient({
       showToast("Realtime Presence", `Agent ${peerAgent.name} is now viewing this ticket`, "realtime");
     } else if (mode === "typing_public") {
       setSimulatedPeer({ agent: peerAgent, typingType: "public_reply" });
-      showToast("Collision Warning", `⚠️ Agent ${peerAgent.name} is drafting a public reply!`, "realtime");
+      showToast("Collision Warning", `Agent ${peerAgent.name} is drafting a public reply!`, "realtime");
     } else if (mode === "typing_internal") {
       setSimulatedPeer({ agent: peerAgent, typingType: "internal_note" });
-      showToast("Collision Warning", `⚠️ Agent ${peerAgent.name} is drafting an internal note!`, "realtime");
+      showToast("Collision Warning", `Agent ${peerAgent.name} is drafting an internal note!`, "realtime");
     }
   };
 
@@ -423,7 +423,8 @@ export function AgentDeskClient({
                 simulatedPeer.typingType === "public_reply" ? "bg-amber-600 text-white font-bold animate-pulse" : "text-slate-400 hover:text-white"
               }`}
             >
-              ⚠️ David Drafting Reply
+              <AlertTriangle className="h-3 w-3 inline mr-1 text-amber-200" />
+              David Drafting Reply
             </button>
             <button
               onClick={() => toggleSimulation("typing_internal")}
@@ -431,7 +432,8 @@ export function AgentDeskClient({
                 simulatedPeer.typingType === "internal_note" ? "bg-amber-500 text-amber-950 font-bold animate-pulse" : "text-slate-400 hover:text-white"
               }`}
             >
-              ⚠️ David Note
+              <AlertTriangle className="h-3 w-3 inline mr-1 text-amber-900" />
+              David Note
             </button>
           </div>
         </div>

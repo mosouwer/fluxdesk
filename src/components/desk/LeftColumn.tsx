@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Ticket, DeskView, TicketStatus } from "@/types/desk";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge, PriorityBadge } from "@/components/ui/badges";
 import { cn } from "@/lib/utils";
 import { matchesTicketSearch } from "@/lib/searchTickets";
 
@@ -249,13 +250,11 @@ export function LeftColumn({
                     <span className="font-mono text-xs font-semibold text-slate-500">
                       #{ticket.number}
                     </span>
-                    {getStatusBadge(ticket.status)}
+                    <StatusBadge status={ticket.status} />
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <Badge variant={ticket.priority} className="text-[10px] px-1.5 py-0 h-4">
-                      {ticket.priority}
-                    </Badge>
+                    <PriorityBadge priority={ticket.priority} />
                   </div>
                 </div>
 

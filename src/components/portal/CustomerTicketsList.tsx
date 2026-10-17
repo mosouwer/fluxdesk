@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Ticket, TicketMessage } from "@/types/desk";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge, PriorityBadge } from "@/components/ui/badges";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { addMessageReply } from "@/app/actions/tickets";
@@ -197,12 +198,8 @@ export function CustomerTicketsList({
                       <span className="font-mono text-xs font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
                         #{ticket.number}
                       </span>
-                      <Badge variant={ticket.status} className="text-[10px] px-1.5 py-0 h-4 uppercase">
-                        {ticket.status}
-                      </Badge>
-                      <Badge variant={ticket.priority} className="text-[10px] px-1.5 py-0 h-4">
-                        {ticket.priority}
-                      </Badge>
+                      <StatusBadge status={ticket.status} />
+                      <PriorityBadge priority={ticket.priority} />
                     </div>
 
                     {/* Subject */}
@@ -244,12 +241,8 @@ export function CustomerTicketsList({
                   #{selectedTicket.number}
                 </span>
                 {/* Read-Only Status Badge for Customers: Cannot change status to solved */}
-                <Badge variant={selectedTicket.status} className="text-xs uppercase">
-                  Status: {selectedTicket.status}
-                </Badge>
-                <Badge variant={selectedTicket.priority} className="text-xs capitalize">
-                  {selectedTicket.priority} Priority
-                </Badge>
+                <StatusBadge status={selectedTicket.status} />
+                <PriorityBadge priority={selectedTicket.priority} />
               </div>
 
               <div className="flex items-center gap-2 text-xs text-slate-500">

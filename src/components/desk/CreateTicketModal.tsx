@@ -266,10 +266,10 @@ export function CreateTicketModal({
                   onChange={(e) => setPriority(e.target.value as TicketPriority)}
                   className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-900 bg-white capitalize"
                 >
-                  <option value="low">🟢 Low</option>
-                  <option value="normal">🔵 Normal</option>
-                  <option value="high">🟠 High</option>
-                  <option value="urgent">🔴 Urgent</option>
+                  <option value="low">Low</option>
+                  <option value="normal">Normal</option>
+                  <option value="high">High</option>
+                  <option value="urgent">Urgent</option>
                 </select>
               </div>
 
@@ -282,10 +282,10 @@ export function CreateTicketModal({
                   onChange={(e) => setChannel(e.target.value as TicketChannel)}
                   className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-900 bg-white capitalize"
                 >
-                  <option value="email">✉️ Email</option>
-                  <option value="web">🌐 Web Portal</option>
-                  <option value="chat">💬 Chat Widget</option>
-                  <option value="api">⚡ API / Internal</option>
+                  <option value="email">Email</option>
+                  <option value="web">Web Portal</option>
+                  <option value="chat">Chat Widget</option>
+                  <option value="api">API / Internal</option>
                 </select>
               </div>
             </div>

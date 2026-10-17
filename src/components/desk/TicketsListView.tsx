@@ -9,6 +9,7 @@ import {
   User,
 } from "@/types/desk";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge, PriorityBadge } from "@/components/ui/badges";
 import { Avatar } from "@/components/ui/avatar";
 import {
   Inbox,
@@ -227,10 +228,8 @@ export function TicketsListView({
       <div className="flex-1 overflow-y-auto px-6 py-4">
         {filteredTickets.length === 0 ? (
           <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-500 shadow-2xs mt-4 flex flex-col items-center justify-center">
-            <div className="h-14 w-14 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center mx-auto mb-3 shadow-2xs select-none">
-              <span className="text-2xl leading-none" role="img" aria-label="inbox">
-                📥
-              </span>
+            <div className="h-12 w-12 rounded-xl bg-zinc-100 text-zinc-600 border border-zinc-200/60 flex items-center justify-center mx-auto mb-3 shadow-2xs select-none">
+              <Inbox className="h-5 w-5 text-zinc-600 stroke-[1.75]" />
             </div>
             <h3 className="text-sm font-bold text-slate-900 tracking-tight">
               No tickets found
@@ -350,16 +349,12 @@ export function TicketsListView({
 
                       {/* Status */}
                       <td className="py-3 px-3 whitespace-nowrap">
-                        <Badge variant={ticket.status} className="text-[10px] uppercase font-bold px-1.5 py-0 h-4.5">
-                          {ticket.status}
-                        </Badge>
+                        <StatusBadge status={ticket.status} />
                       </td>
 
                       {/* Priority */}
                       <td className="py-3 px-3 whitespace-nowrap">
-                        <Badge variant={ticket.priority} className="text-[10px] capitalize px-1.5 py-0 h-4.5">
-                          {ticket.priority}
-                        </Badge>
+                        <PriorityBadge priority={ticket.priority} />
                       </td>
 
                       {/* Assignee */}

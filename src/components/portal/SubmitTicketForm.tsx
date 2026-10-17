@@ -211,10 +211,10 @@ export function SubmitTicketForm({
               onChange={(e) => setPriority(e.target.value as TicketPriority)}
               className="w-full h-9 px-3 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800 cursor-pointer disabled:opacity-50"
             >
-              <option value="low">⚪ Low</option>
-              <option value="normal">🔵 Normal</option>
-              <option value="high">🟠 High</option>
-              <option value="urgent">🔴 Urgent</option>
+              <option value="low">Low</option>
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
             </select>
           </div>
         </div>

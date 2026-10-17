@@ -277,10 +277,12 @@ export function TicketChatWithRealtime({
               <AlertTriangle className="h-3.5 w-3.5" />
             </div>
             <div>
-              <span className="font-bold">
-                ⚠️{" "}
-                {effectivePeerAgents.map((a) => a.userName).join(", ")}{" "}
-                is also viewing this ticket.
+              <span className="font-bold inline-flex items-center gap-1.5">
+                <AlertTriangle className="h-3.5 w-3.5 text-amber-800 shrink-0 inline" />
+                <span>
+                  {effectivePeerAgents.map((a) => a.userName).join(", ")}{" "}
+                  is also viewing this ticket.
+                </span>
               </span>
               <span className="text-[11px] text-amber-800/90 ml-1.5 hidden sm:inline">
                 Coordinate to prevent duplicate replies.

@@ -36,3 +36,5 @@ export function Badge({ className, variant = "default", ...props }: BadgeProps) 
     />
   );
 }
+
+export { StatusBadge, PriorityBadge } from "./badges";

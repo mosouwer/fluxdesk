@@ -26,6 +26,7 @@ import { Ticket, TicketMessage, MessageType, TicketStatus, User } from "@/types/
 import { AgentPresence } from "@/types/realtime";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge, PriorityBadge } from "@/components/ui/badges";
 import { Button } from "@/components/ui/button";
 import { AgentCollisionBanner } from "@/components/desk/AgentCollisionBanner";
 import { cn } from "@/lib/utils";
@@ -168,12 +169,8 @@ export function CenterColumn({
             <span className="font-mono text-xs font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
               #{ticket.number}
             </span>
-            <Badge variant={ticket.status} className="text-xs uppercase">
-              {ticket.status}
-            </Badge>
-            <Badge variant={ticket.priority} className="text-xs">
-              {ticket.priority} priority
-            </Badge>
+            <StatusBadge status={ticket.status} />
+            <PriorityBadge priority={ticket.priority} />
             <span className="text-xs text-slate-400 capitalize flex items-center gap-1 font-medium">
               <Globe className="h-3 w-3 text-slate-400" />
               via {ticket.channel}
