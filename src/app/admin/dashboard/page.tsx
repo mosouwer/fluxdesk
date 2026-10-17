@@ -282,57 +282,57 @@ export default async function AdminDashboardPage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800">
+    <div className="min-h-screen bg-zinc-50/50 flex flex-col font-sans text-zinc-900">
       {/* Top Navigation */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-2xs">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <header className="bg-white/80 backdrop-blur-md border-b border-zinc-200/80 sticky top-0 z-30">
+        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-xs">
-              <LifeBuoy className="h-5 w-5" />
+            <div className="h-8 w-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center shadow-xs">
+              <LifeBuoy className="h-4.5 w-4.5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-slate-900 tracking-tight text-base block leading-tight">
+                <span className="font-semibold text-zinc-900 tracking-tight text-sm block leading-tight">
                   FluxDesk Admin
                 </span>
-                <span className="text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.5 rounded">
+                <span className="text-[10px] font-medium bg-zinc-100 text-zinc-600 border border-zinc-200 px-1.5 py-0.5 rounded-full">
                   Analytics &amp; CSAT
                 </span>
               </div>
-              <span className="text-xs text-slate-500 font-medium">
+              <span className="text-[11px] text-zinc-400 font-medium">
                 {workspace.name} &bull; /{workspace.slug}
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <Link
               href="/"
-              className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors border border-slate-200/60"
+              className="text-xs font-medium text-zinc-600 hover:text-zinc-900 flex items-center gap-1.5 bg-zinc-100 hover:bg-zinc-200/70 px-2.5 py-1.5 rounded-md transition-colors border border-zinc-200/80"
             >
               <span>Agent Desk</span>
-              <ExternalLink className="h-3 w-3 text-slate-400" />
+              <ExternalLink className="h-3 w-3 text-zinc-400" />
             </Link>
 
             <Link
               href="/admin/team"
-              className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors border border-slate-200/60"
+              className="text-xs font-medium text-zinc-600 hover:text-zinc-900 flex items-center gap-1.5 bg-zinc-100 hover:bg-zinc-200/70 px-2.5 py-1.5 rounded-md transition-colors border border-zinc-200/80"
             >
-              <Users className="h-3 w-3 text-slate-400" />
+              <Users className="h-3 w-3 text-zinc-400" />
               <span>Team &amp; Roles</span>
             </Link>
 
             <Link
               href="/admin/settings"
-              className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors border border-slate-200/60"
+              className="text-xs font-medium text-zinc-600 hover:text-zinc-900 flex items-center gap-1.5 bg-zinc-100 hover:bg-zinc-200/70 px-2.5 py-1.5 rounded-md transition-colors border border-zinc-200/80"
             >
-              <Settings className="h-3 w-3 text-slate-400" />
+              <Settings className="h-3 w-3 text-zinc-400" />
               <span>Settings</span>
             </Link>
 
             <Link
               href="/onboard"
-              className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors border border-blue-200"
+              className="text-xs font-medium text-zinc-900 hover:text-zinc-700 flex items-center gap-1 bg-white hover:bg-zinc-50 px-2.5 py-1.5 rounded-md transition-colors border border-zinc-200/80 shadow-2xs"
             >
               <span>+ New Brand</span>
             </Link>
@@ -341,7 +341,7 @@ export default async function AdminDashboardPage() {
               <button
                 type="submit"
                 title="Sign Out"
-                className="text-xs font-semibold text-slate-500 hover:text-rose-600 flex items-center gap-1 bg-slate-100 hover:bg-rose-50 px-2.5 py-1.5 rounded-lg transition-colors border border-slate-200/60 cursor-pointer"
+                className="text-xs font-medium text-zinc-500 hover:text-rose-600 flex items-center gap-1 bg-zinc-100 hover:bg-rose-50 px-2 py-1.5 rounded-md transition-colors border border-zinc-200/80 cursor-pointer"
               >
                 <LogOut className="h-3 w-3" />
                 <span>Logout</span>
@@ -352,138 +352,106 @@ export default async function AdminDashboardPage() {
       </header>
 
       {/* Main Container */}
-      <main className="max-w-6xl mx-auto px-6 py-8 flex-1 w-full space-y-7">
+      <main className="max-w-6xl mx-auto px-6 py-8 flex-1 w-full space-y-6">
         {/* Header Title */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-xl font-bold tracking-tight text-zinc-900">
               Workspace Performance &amp; CSAT
             </h1>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-zinc-500 mt-0.5">
               Live operational metrics, ticket resolution breakdown, and team workload distribution.
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg font-medium">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-full font-medium">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Tenant RLS Isolated
             </span>
           </div>
         </div>
 
-        {/* 4 STAT CARDS */}
+        {/* 1. TOP KPI BENTO GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Stat 1: Open / Pending Tickets */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-3">
+          {/* Card 1: Open / Pending Tickets */}
+          <div className="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-2xs hover:border-zinc-300 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <span className="text-xs font-medium text-zinc-500">
                 Open &amp; Pending
               </span>
-              <div className="h-8 w-8 rounded-lg bg-amber-50 text-amber-600 border border-amber-200/80 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-600">
                 <Clock className="h-4 w-4" />
               </div>
             </div>
-            <div>
-              <div className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                {openPendingCount}
-              </div>
-              <div className="text-[11px] text-amber-700 font-medium flex items-center gap-1 mt-1">
-                <span>Active queue requiring action</span>
-              </div>
+            <div className="text-2xl font-semibold tracking-tight text-zinc-900 tabular-nums mt-3">
+              {openPendingCount}
             </div>
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+            <div className="mt-2.5 pt-2.5 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-400">
               <span>Unassigned:</span>
-              <span className="font-semibold text-slate-700">{unassignedCount}</span>
+              <span className="font-medium text-zinc-700 tabular-nums">{unassignedCount}</span>
             </div>
           </div>
 
-          {/* Stat 2: Solved Tickets */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-3">
+          {/* Card 2: Solved Tickets */}
+          <div className="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-2xs hover:border-zinc-300 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <span className="text-xs font-medium text-zinc-500">
                 Solved Tickets
               </span>
-              <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200/80 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-600">
                 <CheckCircle2 className="h-4 w-4" />
               </div>
             </div>
-            <div>
-              <div className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                {solvedCount}
-              </div>
-              <div className="text-[11px] text-emerald-700 font-medium flex items-center gap-1 mt-1">
-                <span>Resolved awaiting customer confirmation</span>
-              </div>
+            <div className="text-2xl font-semibold tracking-tight text-zinc-900 tabular-nums mt-3">
+              {solvedCount}
             </div>
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+            <div className="mt-2.5 pt-2.5 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-400">
               <span>Resolution Rate:</span>
-              <span className="font-semibold text-slate-700">
+              <span className="font-medium text-zinc-700 tabular-nums">
                 {tickets.length > 0 ? Math.round((solvedCount / tickets.length) * 100) : 0}%
               </span>
             </div>
           </div>
 
-          {/* Stat 3: Closed Tickets */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-3">
+          {/* Card 3: Closed Tickets */}
+          <div className="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-2xs hover:border-zinc-300 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <span className="text-xs font-medium text-zinc-500">
                 Closed Tickets
               </span>
-              <div className="h-8 w-8 rounded-lg bg-blue-50 text-blue-600 border border-blue-200/80 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-600">
                 <Archive className="h-4 w-4" />
               </div>
             </div>
-            <div>
-              <div className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                {closedCount}
-              </div>
-              <div className="text-[11px] text-blue-700 font-medium flex items-center gap-1 mt-1">
-                <span>Archived and fully completed</span>
-              </div>
+            <div className="text-2xl font-semibold tracking-tight text-zinc-900 tabular-nums mt-3">
+              {closedCount}
             </div>
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+            <div className="mt-2.5 pt-2.5 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-400">
               <span>Total Processed:</span>
-              <span className="font-semibold text-slate-700">{solvedCount + closedCount}</span>
+              <span className="font-medium text-zinc-700 tabular-nums">{solvedCount + closedCount}</span>
             </div>
           </div>
 
-          {/* Stat 4: Average CSAT Rating (1 to 5) */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-3">
+          {/* Card 4: Average CSAT Rating */}
+          <div className="bg-white border border-zinc-200/80 rounded-xl p-5 shadow-2xs hover:border-zinc-300 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <span className="text-xs font-medium text-zinc-500">
                 Average CSAT
               </span>
-              <div className="h-8 w-8 rounded-lg bg-purple-50 text-purple-600 border border-purple-200/80 flex items-center justify-center">
-                <Star className="h-4 w-4 fill-purple-500 text-purple-500" />
+              <div className="w-8 h-8 rounded-lg bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-600">
+                <Star className="h-4 w-4" />
               </div>
             </div>
-            <div>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                  {averageCsat}
-                </span>
-                <span className="text-xs font-semibold text-slate-400">/ 5.0</span>
-              </div>
-              <div className="flex items-center gap-1 mt-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className={`h-3 w-3 ${
-                      star <= Math.round(Number(averageCsat))
-                        ? "text-amber-400 fill-amber-400"
-                        : "text-slate-200"
-                    }`}
-                  />
-                ))}
-                <span className="text-[10px] text-slate-400 ml-1">
-                  ({ratedTickets.length} rated)
-                </span>
-              </div>
+            <div className="text-2xl font-semibold tracking-tight text-zinc-900 tabular-nums mt-3 flex items-baseline gap-1.5">
+              <span>{averageCsat}</span>
+              <span className="text-xs font-normal text-zinc-400">/ 5.0</span>
             </div>
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+            <div className="mt-2.5 pt-2.5 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-400">
               <span>Satisfaction Tier:</span>
-              <span className="font-semibold text-emerald-600">Excellent</span>
+              <span className="font-medium text-emerald-600">
+                Excellent ({ratedTickets.length} rated)
+              </span>
             </div>
           </div>
         </div>
@@ -491,166 +459,179 @@ export default async function AdminDashboardPage() {
         {tickets.length === 0 ? (
           <EmptyTicketsState className="my-2" />
         ) : (
-          /* PER-AGENT WORKLOAD TABLE */
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
-          <div className="px-6 py-4.5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h2 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                <Users className="h-4.5 w-4.5 text-blue-600" />
-                <span>Agent Workload Distribution</span>
-              </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Active tickets assigned across agents and relative team capacity.
-              </p>
+          /* 2. AGENT WORKLOAD TABLE */
+          <div className="bg-white border border-zinc-200/80 rounded-xl shadow-2xs overflow-hidden">
+            <div className="px-5 py-4 border-b border-zinc-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-zinc-50/40">
+              <div>
+                <h2 className="text-sm font-semibold text-zinc-900 tracking-tight flex items-center gap-2">
+                  <Users className="h-4 w-4 text-zinc-600" />
+                  <span>Agent Workload Distribution</span>
+                </h2>
+                <p className="text-xs text-zinc-400 mt-0.5">
+                  Active tickets assigned across agents and relative team capacity.
+                </p>
+              </div>
+
+              <div className="text-xs text-zinc-500 font-medium">
+                Total Assigned: <strong className="text-zinc-900 tabular-nums">{totalAssignedTickets}</strong> tickets
+              </div>
             </div>
 
-            <div className="text-xs text-slate-500 font-medium">
-              Total Assigned: <strong className="text-slate-900">{totalAssignedTickets}</strong> tickets
-            </div>
-          </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-zinc-50/80 border-b border-zinc-200/80 text-[11px] font-medium text-zinc-500 uppercase tracking-wider select-none">
+                    <th className="py-2.5 px-5">Agent</th>
+                    <th className="py-2.5 px-4">Role</th>
+                    <th className="py-2.5 px-4 text-center">Assigned Tickets</th>
+                    <th className="py-2.5 px-4 text-center">Active Queue</th>
+                    <th className="py-2.5 px-4 text-center">Resolved</th>
+                    <th className="py-2.5 px-5 min-w-[180px]">Workload Share</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-100 text-xs">
+                  {agentWorkloadStats.map(({ agent, count, sharePercent, openCount, resolvedCount }) => {
+                    const initials = agent.name
+                      ? agent.name
+                          .split(" ")
+                          .map((n: string) => n[0])
+                          .join("")
+                          .slice(0, 2)
+                          .toUpperCase()
+                      : "A";
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-200 bg-slate-50/75 text-[11px] font-semibold text-slate-500 uppercase tracking-wider select-none">
-                  <th className="py-3 px-6">Agent</th>
-                  <th className="py-3 px-4">Role</th>
-                  <th className="py-3 px-4 text-center">Assigned Tickets</th>
-                  <th className="py-3 px-4 text-center">Active Queue</th>
-                  <th className="py-3 px-4 text-center">Resolved</th>
-                  <th className="py-3 px-6 min-w-[200px]">Workload Share</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-xs">
-                {agentWorkloadStats.map(({ agent, count, sharePercent, openCount, resolvedCount }) => (
-                  <tr key={agent.email} className="hover:bg-slate-50/70 transition-colors">
-                    {/* Agent Name & Avatar */}
-                    <td className="py-3.5 px-6">
-                      <div className="flex items-center gap-3">
-                        <Avatar
-                          src={agent.avatar}
-                          fallback={agent.name[0]}
-                          size="sm"
-                          className="h-8 w-8 rounded-full border border-slate-200"
-                        />
+                    return (
+                      <tr
+                        key={agent.email}
+                        className="h-11 hover:bg-zinc-50/70 transition-colors border-b border-zinc-100 last:border-0"
+                      >
+                        {/* Agent Name & Avatar */}
+                        <td className="py-2 px-5">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-7 h-7 rounded-full bg-zinc-900 text-white text-[11px] font-medium flex items-center justify-center shrink-0">
+                              {initials}
+                            </div>
+                            <div>
+                              <div className="font-medium text-zinc-900 leading-tight">
+                                {agent.name}
+                              </div>
+                              <div className="text-[11px] text-zinc-400 font-mono leading-tight">
+                                {agent.email}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Role */}
+                        <td className="py-2 px-4 whitespace-nowrap">
+                          {agent.role === "admin" ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-zinc-100 text-zinc-800 border border-zinc-200">
+                              <ShieldCheck className="h-3 w-3 text-zinc-600" />
+                              <span>Admin</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-zinc-100 text-zinc-700 border border-zinc-200">
+                              <span>Agent</span>
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Assigned Tickets */}
+                        <td className="py-2 px-4 text-center font-medium text-zinc-900 tabular-nums">
+                          {count}
+                        </td>
+
+                        {/* Active Queue */}
+                        <td className="py-2 px-4 text-center font-medium">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] bg-amber-50 text-amber-700 border border-amber-200/60 tabular-nums">
+                            {openCount}
+                          </span>
+                        </td>
+
+                        {/* Resolved */}
+                        <td className="py-2 px-4 text-center font-medium">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200/60 tabular-nums">
+                            {resolvedCount}
+                          </span>
+                        </td>
+
+                        {/* Workload Share Progress Bar */}
+                        <td className="py-2 px-5">
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-[11px]">
+                              <span className="font-medium text-zinc-700 tabular-nums">{sharePercent}%</span>
+                              <span className="text-zinc-400 tabular-nums">{count} of {totalAssignedTickets}</span>
+                            </div>
+                            <div className="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-300 ${
+                                  sharePercent > 50
+                                    ? "bg-amber-500"
+                                    : sharePercent > 0
+                                    ? "bg-zinc-900"
+                                    : "bg-zinc-300"
+                                }`}
+                                style={{ width: `${Math.max(sharePercent, 3)}%` }}
+                              />
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+
+                  {/* Unassigned Tickets Summary Row */}
+                  <tr className="h-11 bg-zinc-50/30 border-b border-zinc-100 last:border-0 font-normal">
+                    <td className="py-2 px-5">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-full bg-zinc-200 text-zinc-600 text-[11px] font-medium flex items-center justify-center shrink-0">
+                          <Inbox className="h-3.5 w-3.5" />
+                        </div>
                         <div>
-                          <div className="font-semibold text-slate-900 leading-tight">
-                            {agent.name}
-                          </div>
-                          <div className="text-[11px] text-slate-500 font-mono leading-tight mt-0.5">
-                            {agent.email}
-                          </div>
+                          <div className="font-medium text-zinc-800 leading-tight">Unassigned Queue</div>
+                          <div className="text-[10px] text-zinc-400 leading-tight">Tickets awaiting assignment</div>
                         </div>
                       </div>
                     </td>
-
-                    {/* Role */}
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      {agent.role === "admin" ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
-                          <ShieldCheck className="h-3 w-3" />
-                          <span>Admin</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                          <span>Agent</span>
-                        </span>
-                      )}
+                    <td className="py-2 px-4 text-zinc-400 text-[11px]">—</td>
+                    <td className="py-2 px-4 text-center font-medium text-zinc-800 tabular-nums">
+                      {unassignedCount}
                     </td>
-
-                    {/* Assigned Tickets */}
-                    <td className="py-3.5 px-4 text-center font-bold text-slate-800 text-sm">
-                      {count}
-                    </td>
-
-                    {/* Active Queue */}
-                    <td className="py-3.5 px-4 text-center font-medium text-amber-700">
-                      <span className="bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md text-[11px]">
-                        {openCount}
+                    <td className="py-2 px-4 text-center font-medium">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] bg-amber-50 text-amber-700 border border-amber-200/60 tabular-nums">
+                        {unassignedCount}
                       </span>
                     </td>
-
-                    {/* Resolved */}
-                    <td className="py-3.5 px-4 text-center font-medium text-emerald-700">
-                      <span className="bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md text-[11px]">
-                        {resolvedCount}
-                      </span>
-                    </td>
-
-                    {/* Workload Share Progress Bar */}
-                    <td className="py-3.5 px-6">
-                      <div className="space-y-1.5">
+                    <td className="py-2 px-4 text-center text-zinc-400 text-[11px]">—</td>
+                    <td className="py-2 px-5">
+                      <div className="space-y-1">
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className="font-semibold text-slate-700">{sharePercent}%</span>
-                          <span className="text-slate-400">{count} of {totalAssignedTickets}</span>
+                          <span className="font-medium text-zinc-600 tabular-nums">
+                            {tickets.length > 0
+                              ? Math.round((unassignedCount / tickets.length) * 100)
+                              : 0}
+                            % of total
+                          </span>
                         </div>
-                        <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200/50">
+                        <div className="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden">
                           <div
-                            className={`h-full rounded-full transition-all duration-300 ${
-                              sharePercent > 50
-                                ? "bg-amber-500"
-                                : sharePercent > 0
-                                ? "bg-blue-600"
-                                : "bg-slate-300"
-                            }`}
-                            style={{ width: `${Math.max(sharePercent, 3)}%` }}
+                            className="h-full bg-zinc-400 rounded-full transition-all duration-300"
+                            style={{
+                              width: `${
+                                tickets.length > 0
+                                  ? Math.max(Math.round((unassignedCount / tickets.length) * 100), 2)
+                                  : 0
+                              }%`,
+                            }}
                           />
                         </div>
                       </div>
                     </td>
                   </tr>
-                ))}
-
-                {/* Unassigned Tickets Summary Row */}
-                <tr className="bg-slate-50/50 font-medium">
-                  <td className="py-3 px-6 text-slate-500 flex items-center gap-2">
-                    <div className="h-7 w-7 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-xs">
-                      <Inbox className="h-3.5 w-3.5" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-semibold text-slate-700">Unassigned Queue</div>
-                      <div className="text-[10px] text-slate-400">Tickets awaiting assignment</div>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 text-slate-400 text-[11px]">—</td>
-                  <td className="py-3 px-4 text-center font-bold text-slate-700 text-sm">
-                    {unassignedCount}
-                  </td>
-                  <td className="py-3 px-4 text-center font-medium text-amber-700">
-                    <span className="bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md text-[11px]">
-                      {unassignedCount}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-center text-slate-400 text-[11px]">—</td>
-                  <td className="py-3 px-6">
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between text-[11px]">
-                        <span className="font-semibold text-slate-600">
-                          {tickets.length > 0
-                            ? Math.round((unassignedCount / tickets.length) * 100)
-                            : 0}
-                          % of total
-                        </span>
-                      </div>
-                      <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200/50">
-                        <div
-                          className="h-full bg-amber-400 rounded-full transition-all duration-300"
-                          style={{
-                            width: `${
-                              tickets.length > 0
-                                ? Math.max(Math.round((unassignedCount / tickets.length) * 100), 2)
-                                : 0
-                            }%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
         )}
       </main>
     </div>
