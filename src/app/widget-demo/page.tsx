@@ -52,7 +52,7 @@ export default function WidgetDemoPage() {
               External SaaS Website Demo
             </span>
             <span className="text-[11px] text-slate-400">
-              Simulating an external website embedding FluxDesk Widget
+              Simulating an external website embedding mellowDesk Widget
             </span>
           </div>
         </div>

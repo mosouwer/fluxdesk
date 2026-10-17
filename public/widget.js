@@ -1,5 +1,5 @@
 /**
- * FluxDesk Multi-Tenant Embeddable Chat Widget
+ * mellowDesk Multi-Tenant Embeddable Chat Widget
  * 
  * Usage:
  * <script 
@@ -9,8 +9,8 @@
  * ></script>
  */
 (function () {
-  if (window.__FluxDeskWidgetInitialized) return;
-  window.__FluxDeskWidgetInitialized = true;
+  if (window.__mellowDeskWidgetInitialized || window.__FluxDeskWidgetInitialized) return;
+  window.__mellowDeskWidgetInitialized = window.__FluxDeskWidgetInitialized = true;
 
   // 1. Detect current script and extract workspace public key & host
   var scriptTag =
@@ -309,23 +309,31 @@
     if (!event.data) return;
 
     // Close request from embedded chat
-    if (event.data === "fluxdesk:close" || event.data.type === "fluxdesk:close") {
+    if (
+      event.data === "fluxdesk:close" ||
+      event.data.type === "fluxdesk:close" ||
+      event.data === "mellowdesk:close" ||
+      event.data.type === "mellowdesk:close"
+    ) {
       toggleWidget(false);
     }
 
     // Color only update
-    if (event.data.type === "fluxdesk:set_brand_color" && event.data.color) {
+    if (
+      (event.data.type === "fluxdesk:set_brand_color" || event.data.type === "mellowdesk:set_brand_color") &&
+      event.data.color
+    ) {
       applyBranding({ color: event.data.color });
     }
 
     // Comprehensive branding update from iframe
-    if (event.data.type === "fluxdesk:set_branding") {
+    if (event.data.type === "fluxdesk:set_branding" || event.data.type === "mellowdesk:set_branding") {
       applyBranding(event.data);
     }
   });
 
-  // Expose global controller API
-  window.FluxDesk = {
+  // Expose global controller API (support both mellowDesk and FluxDesk)
+  window.mellowDesk = window.FluxDesk = {
     open: function () { toggleWidget(true); },
     close: function () { toggleWidget(false); },
     toggle: function () { toggleWidget(); },

@@ -207,7 +207,7 @@ export async function getSuperPlatformData(): Promise<SuperAdminPlatformData> {
             email: u.email,
             role: (u.role as "superadmin" | "admin" | "agent" | "customer") || "agent",
             workspaceId: u.workspace_id || "",
-            workspaceName: ws?.name || "FluxDesk",
+            workspaceName: ws?.name || "mellowDesk",
             isActive: u.is_active !== false,
             avatarUrl:
               u.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.email}`,
@@ -228,7 +228,7 @@ export async function getSuperPlatformData(): Promise<SuperAdminPlatformData> {
               email: custEmail,
               role: "customer",
               workspaceId: t.workspace_id || "",
-              workspaceName: ws?.name || "FluxDesk",
+              workspaceName: ws?.name || "mellowDesk",
               isActive: true,
               avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${custEmail}`,
               createdAt: t.created_at || new Date().toISOString(),

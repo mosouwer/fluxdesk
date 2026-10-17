@@ -117,7 +117,7 @@ export function CreateAgentModal({
 
   const handleCopyCredentials = () => {
     if (!createdCredentials) return;
-    const text = `FluxDesk Login Credentials:\nEmail: ${createdCredentials.email}\nPassword: ${createdCredentials.password}\nRole: ${createdCredentials.role}\nPortal URL: ${window.location.origin}/login`;
+    const text = `mellowDesk Login Credentials:\nEmail: ${createdCredentials.email}\nPassword: ${createdCredentials.password}\nRole: ${createdCredentials.role}\nPortal URL: ${window.location.origin}/login`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);

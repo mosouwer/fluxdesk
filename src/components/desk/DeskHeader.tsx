@@ -45,7 +45,7 @@ export function DeskHeader({
     workspaceName ||
     currentUser?.workspaceName ||
     currentUser?.company ||
-    (currentUser?.role === "superadmin" ? "Super Admin" : "FluxDesk");
+    (currentUser?.role === "superadmin" ? "Super Admin" : "mellowDesk");
 
   const isControlled = onSearchChange !== undefined;
   const currentQuery = isControlled ? (searchQuery ?? "") : localQuery;
@@ -107,7 +107,7 @@ export function DeskHeader({
           <div className="h-8 w-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-sm">
             <LifeBuoy className="h-4.5 w-4.5" />
           </div>
-          <span>FluxDesk</span>
+          <span>mellowDesk</span>
         </div>
 
         <div className="h-4 w-[1px] bg-slate-200 mx-1" />

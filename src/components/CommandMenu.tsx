@@ -148,7 +148,7 @@ export function CommandMenu() {
           {/* Footer Hints */}
           <div className="border-t border-zinc-100 px-3.5 py-2 flex items-center justify-between text-[11px] text-zinc-400 bg-zinc-50/50">
             <span className="flex items-center gap-1 font-medium">
-              <span>FluxDesk Command</span>
+              <span>mellowDesk Command</span>
             </span>
             <div className="flex items-center gap-1.5">
               <span>Navigate</span>

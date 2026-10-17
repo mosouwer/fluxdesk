@@ -377,7 +377,7 @@ export const DESK_MACROS: Macro[] = [
       {
         action: "add_comment",
         type: "public_reply",
-        body: "You can configure Okta SAML 2.0 SSO by navigating to **Organization Settings > Security > Single Sign-On**.\n\n1. Download our SAML SP Metadata XML from your dashboard\n2. Add the ACS URL and Entity ID into your Okta admin portal\n3. Paste your Okta Identity Provider Issuer and x509 Certificate\n\nDetailed walkthrough: https://docs.fluxdesk.io/security/okta-sso",
+        body: "You can configure Okta SAML 2.0 SSO by navigating to **Organization Settings > Security > Single Sign-On**.\n\n1. Download our SAML SP Metadata XML from your dashboard\n2. Add the ACS URL and Entity ID into your Okta admin portal\n3. Paste your Okta Identity Provider Issuer and x509 Certificate\n\nDetailed walkthrough: https://docs.mellowdesk.io/security/okta-sso",
       },
       {
         action: "set_status",

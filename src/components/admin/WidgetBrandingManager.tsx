@@ -698,7 +698,7 @@ export function WidgetBrandingManager({ workspace }: WidgetBrandingManagerProps)
                 </div>
 
                 <div className="text-center text-[10px] text-slate-400">
-                  Powered by <strong className="text-slate-600">FluxDesk</strong>
+                  Powered by <strong className="text-slate-600">mellowDesk</strong>
                 </div>
               </div>
             </div>

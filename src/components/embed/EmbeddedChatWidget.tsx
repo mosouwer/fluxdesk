@@ -335,7 +335,7 @@ export function EmbeddedChatWidget({ workspace }: EmbeddedChatWidgetProps) {
         <footer className="pt-3 text-center">
           <div className="inline-flex items-center gap-1 text-[10px] text-slate-400">
             <span>Powered by</span>
-            <span className="font-semibold text-slate-600">FluxDesk</span>
+            <span className="font-semibold text-slate-600">mellowDesk</span>
           </div>
         </footer>
       </main>

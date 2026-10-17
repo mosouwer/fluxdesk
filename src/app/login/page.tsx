@@ -73,7 +73,7 @@ export default function LoginPage() {
           <LifeBuoy className="h-6 w-6" />
         </div>
         <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
-          Sign In to FluxDesk
+          Sign In to mellowDesk
         </h1>
         <p className="mt-1.5 text-xs text-slate-500 max-w-md mx-auto">
           Enter your email and password, or select a demo role. Brand administrators have full access to the Admin Panel.

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FluxDesk - Multi-Tenant Zendesk Helpdesk",
+  title: "mellowDesk - Multi-Tenant Zendesk Helpdesk",
   description: "Modern Zendesk-style 3-column agent desk with public replies and yellow internal notes.",
 };
 

@@ -70,7 +70,7 @@ export default function AdminTeamPage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-zinc-900 tracking-tight text-sm block leading-tight">
-                  FluxDesk Admin
+                  mellowDesk Admin
                 </span>
                 <span className="text-[10px] font-medium bg-zinc-100 text-zinc-600 border border-zinc-200 px-1.5 py-0.5 rounded-full">
                   Team Management

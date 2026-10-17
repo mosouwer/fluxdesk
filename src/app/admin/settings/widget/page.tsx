@@ -147,7 +147,7 @@ export default async function WidgetBrandingSettingsPage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-slate-900 tracking-tight text-base block leading-tight">
-                  FluxDesk Admin
+                  mellowDesk Admin
                 </span>
                 <span className="text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.5 rounded">
                   Widget Branding

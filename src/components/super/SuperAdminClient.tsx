@@ -271,7 +271,7 @@ export function SuperAdminClient({ initialData }: SuperAdminClientProps) {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-white text-base tracking-tight">
-                  FluxDesk Root
+                  mellowDesk Root
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
                   Super Admin
@@ -773,7 +773,7 @@ export function SuperAdminClient({ initialData }: SuperAdminClientProps) {
                 <span>Tenant Isolation & Row-Level Security</span>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed">
-                FluxDesk runs strict PostgreSQL Row-Level Security (RLS) policies enforcing complete tenant isolation.
+                mellowDesk runs strict PostgreSQL Row-Level Security (RLS) policies enforcing complete tenant isolation.
                 Cross-tenant queries are blocked at the database engine level via <code>auth_user_workspace_id()</code>.
               </p>
               <div className="space-y-2 pt-2">

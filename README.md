@@ -1,4 +1,4 @@
-# FluxDesk - Multi-Tenant Helpdesk (Zendesk Clone) Database Engine
+# mellowDesk - Multi-Tenant Helpdesk (Zendesk Clone) Database Engine
 
 This repository contains the complete production-ready Supabase PostgreSQL schema, Row-Level Security (RLS) policies, triggers, and sample seed data for a multi-tenant helpdesk and ticketing platform.
 
@@ -7,7 +7,7 @@ This repository contains the complete production-ready Supabase PostgreSQL schem
 ## 📁 Repository Structure
 
 ```
-FluxDesk/
+mellowDesk/
 ├── public/
 │   └── widget.js                               # Embeddable floating web widget script
 ├── src/
