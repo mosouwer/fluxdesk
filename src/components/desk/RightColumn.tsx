@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   User as UserIcon,
   Mail,
@@ -42,6 +42,17 @@ export function RightColumn({
   const [isAddingTag, setIsAddingTag] = useState(false);
 
   const customer = ticket.customer;
+
+  const effectiveAgents = useMemo(() => {
+    const list = [...(availableAgents || [])];
+    if (currentUser && currentUser.role !== "customer" && !list.some((a) => a.id === currentUser.id)) {
+      list.unshift(currentUser);
+    }
+    if (ticket.assignedAgent && !list.some((a) => a.id === ticket.assignedAgent?.id)) {
+      list.push(ticket.assignedAgent);
+    }
+    return list;
+  }, [availableAgents, currentUser, ticket.assignedAgent]);
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(customer.email);
@@ -192,14 +203,14 @@ export function RightColumn({
                 if (agentId === "unassigned") {
                   onUpdateTicket({ assignedAgent: undefined });
                 } else {
-                  const agent = availableAgents.find((a) => a.id === agentId);
+                  const agent = effectiveAgents.find((a) => a.id === agentId);
                   if (agent) onUpdateTicket({ assignedAgent: agent });
                 }
               }}
               className="w-full h-8 pl-3 pr-8 text-xs bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 appearance-none font-medium cursor-pointer shadow-2xs"
             >
               <option value="unassigned">— Unassigned —</option>
-              {availableAgents.map((agent) => (
+              {effectiveAgents.map((agent) => (
                 <option key={agent.id} value={agent.id}>
                   {agent.name} ({agent.role})
                 </option>

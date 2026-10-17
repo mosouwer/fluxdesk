@@ -9,27 +9,64 @@ import { TicketsListView } from "@/components/desk/TicketsListView";
 import { MacroPopup } from "@/components/desk/MacroPopup";
 import {
   CURRENT_AGENT,
-  AVAILABLE_AGENTS,
   DESK_MACROS,
 } from "@/data/mockDeskData";
 import { Ticket, DeskView, MessageType, TicketStatus, Macro, TicketMessage, User } from "@/types/desk";
 import { useTicketRealtime } from "@/hooks/useTicketRealtime";
 import { addMessageReply, updateTicketStatus, getAgentTickets } from "@/app/actions/tickets";
+import { getTeamMembers } from "@/app/actions/team";
 import { CheckCircle2, Lock, Zap, Radio } from "lucide-react";
 
 interface AgentDeskClientProps {
   initialTickets: Ticket[];
   currentUser?: User;
+  availableAgents?: User[];
 }
 
 export function AgentDeskClient({
   initialTickets,
   currentUser = CURRENT_AGENT,
+  availableAgents: initialAgents,
 }: AgentDeskClientProps) {
   const [tickets, setTickets] = useState<Ticket[]>(initialTickets);
+  const [teamAgents, setTeamAgents] = useState<User[]>(initialAgents || []);
   const [activeView, setActiveView] = useState<DeskView>("open");
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Dynamically load teammates for current brand/workspace
+  useEffect(() => {
+    if (initialAgents && initialAgents.length > 0) {
+      setTeamAgents(initialAgents);
+      return;
+    }
+
+    let isMounted = true;
+    async function fetchAgents() {
+      try {
+        const members = await getTeamMembers(currentUser?.workspace_id);
+        if (isMounted && members && members.length > 0) {
+          const mapped: User[] = members.map((m) => ({
+            id: m.id,
+            name: m.fullName,
+            email: m.email,
+            avatar: m.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.email}`,
+            role: m.role,
+            workspaceId: m.workspaceId,
+            workspace_id: m.workspaceId,
+            isActive: m.isActive,
+          }));
+          setTeamAgents(mapped);
+        }
+      } catch (err) {
+        console.warn("Failed to load workspace agents in client:", err);
+      }
+    }
+    fetchAgents();
+    return () => {
+      isMounted = false;
+    };
+  }, [currentUser?.workspace_id, initialAgents]);
 
   // Sync initial search from URL params if present
   useEffect(() => {
@@ -143,9 +180,9 @@ export function AgentDeskClient({
           if (t.id === selectedTicketId) {
             let assignedAgent = t.assignedAgent;
             if (updates.assignedAgentId) {
-              assignedAgent = AVAILABLE_AGENTS.find(
-                (a) => a.id === updates.assignedAgentId
-              );
+              assignedAgent =
+                teamAgents.find((a) => a.id === updates.assignedAgentId) ||
+                t.assignedAgent;
             }
             return {
               ...t,
@@ -310,7 +347,7 @@ export function AgentDeskClient({
   };
 
   const toggleSimulation = (mode: "none" | "viewing" | "typing_public" | "typing_internal") => {
-    const peerAgent = AVAILABLE_AGENTS[1];
+    const peerAgent = teamAgents.find((a) => a.id !== currentUser.id) || teamAgents[0] || currentUser;
     if (mode === "none") {
       setSimulatedPeer({ agent: null, typingType: null });
       showToast("Realtime Simulation", "Cleared simulated peer presence", "realtime");
@@ -431,7 +468,7 @@ export function AgentDeskClient({
 
             <RightColumn
               ticket={selectedTicket}
-              availableAgents={AVAILABLE_AGENTS}
+              availableAgents={teamAgents.length > 0 ? teamAgents : (currentUser ? [currentUser] : [])}
               currentUser={currentUser}
               onUpdateTicket={handleUpdateTicket}
             />

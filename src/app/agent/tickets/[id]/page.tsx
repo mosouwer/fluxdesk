@@ -3,10 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCurrentSessionUser } from "@/app/actions/auth";
 import { getTicketById } from "@/app/actions/tickets";
+import { getTeamMembers } from "@/app/actions/team";
 import { TicketDetailClient } from "@/components/agent/TicketDetailClient";
 import { DeskHeader } from "@/components/desk/DeskHeader";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Clock, Globe } from "lucide-react";
+import { User } from "@/types/desk";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +26,18 @@ export default async function AgentTicketDetailPage({ params }: AgentTicketPageP
   if (!ticket) {
     notFound();
   }
+
+  const teamMembers = await getTeamMembers(currentUser?.workspace_id);
+  const availableAgents: User[] = teamMembers.map((m) => ({
+    id: m.id,
+    name: m.fullName,
+    email: m.email,
+    avatar: m.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.email}`,
+    role: m.role,
+    workspaceId: m.workspaceId,
+    workspace_id: m.workspaceId,
+    isActive: m.isActive,
+  }));
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-100 font-sans">
@@ -77,7 +91,11 @@ export default async function AgentTicketDetailPage({ params }: AgentTicketPageP
       </div>
 
       {/* Main Content: Wired Client Component */}
-      <TicketDetailClient initialTicket={ticket} />
+      <TicketDetailClient
+        initialTicket={ticket}
+        currentUser={currentUser || undefined}
+        availableAgents={availableAgents}
+      />
     </div>
   );
 }

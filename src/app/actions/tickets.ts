@@ -4,13 +4,14 @@ import { revalidatePath } from "next/cache";
 import { serverSupabase as supabase, createClient, isLiveSupabaseConfigured } from "@/utils/supabase/server";
 import { adminClient, isAdminConfigured } from "@/utils/supabase/admin";
 import { getCurrentSessionUser } from "@/app/actions/auth";
-import { Ticket, TicketMessage, TicketStatus, TicketPriority, TicketChannel, MessageType } from "@/types/desk";
+import { Ticket, TicketMessage, TicketStatus, TicketPriority, TicketChannel, MessageType, User } from "@/types/desk";
 import { INITIAL_TICKETS, CURRENT_AGENT, CUSTOMER_EMILY } from "@/data/mockDeskData";
 import {
   getSharedTickets,
   addSharedTicket,
   updateSharedTicketsList,
 } from "@/data/ticketStore";
+import { getSharedTeamMembers } from "@/data/teamStore";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -594,10 +595,52 @@ export async function updateTicketStatus({
       updatePayload.assigned_agent_id = assignedAgentId;
     }
 
+    const queryClient = isAdminConfigured ? adminClient : (await createClient());
     try {
-      await supabase.from("tickets").update(updatePayload).eq("id", ticketId);
+      await queryClient.from("tickets").update(updatePayload).eq("id", ticketId);
     } catch (dbErr) {
       console.warn("Supabase updateTicketStatus fallback:", dbErr);
+    }
+
+    let assignedAgentUser: User | undefined = undefined;
+    if (assignedAgentId) {
+      try {
+        const { data: agentData } = await queryClient
+          .from("users")
+          .select("id, full_name, email, avatar_url, role, workspace_id")
+          .eq("id", assignedAgentId)
+          .maybeSingle();
+
+        if (agentData) {
+          assignedAgentUser = {
+            id: agentData.id,
+            name: agentData.full_name || agentData.email?.split("@")[0] || "Agent",
+            email: agentData.email,
+            avatar: agentData.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${agentData.email}`,
+            role: agentData.role,
+            workspaceId: agentData.workspace_id,
+            workspace_id: agentData.workspace_id,
+          };
+        }
+      } catch {
+        // fallback
+      }
+
+      if (!assignedAgentUser) {
+        const team = getSharedTeamMembers();
+        const found = team.find((m) => m.id === assignedAgentId);
+        if (found) {
+          assignedAgentUser = {
+            id: found.id,
+            name: found.fullName,
+            email: found.email,
+            avatar: found.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${found.email}`,
+            role: found.role,
+            workspaceId: found.workspaceId,
+            workspace_id: found.workspaceId,
+          };
+        }
+      }
     }
 
     // Memory cache update
@@ -610,9 +653,7 @@ export async function updateTicketStatus({
             priority: priority || t.priority,
             assignedAgent:
               assignedAgentId !== undefined
-                ? assignedAgentId
-                  ? CURRENT_AGENT
-                  : undefined
+                ? assignedAgentUser
                 : t.assignedAgent,
             updatedAt: now,
           };

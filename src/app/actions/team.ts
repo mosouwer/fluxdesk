@@ -217,40 +217,69 @@ export async function getTeamMembers(workspaceId?: string): Promise<TeamMember[]
           .from("users")
           .select("id, email, full_name, role, workspace_id, avatar_url, is_active, created_at")
           .eq("workspace_id", targetWorkspaceId)
-          .in("role", ["admin", "agent"])
+          .neq("role", "customer")
           .order("created_at", { ascending: false });
 
-        if (!error && dbUsers) {
-          const members: TeamMember[] = dbUsers.map((u: any) => ({
-            id: u.id,
-            email: u.email,
-            fullName: u.full_name || u.email.split("@")[0],
-            role: u.role as "admin" | "agent",
-            workspaceId: u.workspace_id,
-            avatarUrl: u.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.email}`,
-            isActive: u.is_active !== false,
-            createdAt: u.created_at,
-          }));
+        let allUsers = dbUsers || [];
 
-          // If the caller is an admin in this workspace, ensure they are present in the list
-          if (sessionUser && sessionUser.workspace_id === targetWorkspaceId) {
-            const hasCaller = members.some((m) => m.id === sessionUser.id || m.email.toLowerCase() === sessionUser.email.toLowerCase());
-            if (!hasCaller) {
-              members.unshift({
-                id: sessionUser.id,
-                email: sessionUser.email,
-                fullName: sessionUser.name,
-                role: "admin",
-                workspaceId: targetWorkspaceId,
-                avatarUrl: sessionUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${sessionUser.email}`,
-                isActive: true,
-                createdAt: new Date().toISOString(),
-              });
+        // Also check workspace_members table to ensure all members assigned to this workspace are included
+        try {
+          const { data: wsMembers } = await db
+            .from("workspace_members")
+            .select("user_id, role")
+            .eq("workspace_id", targetWorkspaceId);
+
+          if (wsMembers && wsMembers.length > 0) {
+            const missingUserIds = wsMembers
+              .map((wm: any) => wm.user_id)
+              .filter((uid: string) => !allUsers.some((u: any) => u.id === uid));
+
+            if (missingUserIds.length > 0) {
+              const { data: extraUsers } = await db
+                .from("users")
+                .select("id, email, full_name, role, workspace_id, avatar_url, is_active, created_at")
+                .in("id", missingUserIds);
+
+              if (extraUsers && extraUsers.length > 0) {
+                allUsers = [...allUsers, ...extraUsers];
+              }
             }
           }
-
-          return members;
+        } catch {
+          // workspace_members fallback
         }
+
+        const members: TeamMember[] = allUsers.map((u: any) => ({
+          id: u.id,
+          email: u.email,
+          fullName: u.full_name || u.email.split("@")[0],
+          role: (u.role === "admin" ? "admin" : "agent") as "admin" | "agent",
+          workspaceId: u.workspace_id || targetWorkspaceId,
+          avatarUrl: u.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.email}`,
+          isActive: u.is_active !== false,
+          createdAt: u.created_at,
+        }));
+
+        // If the caller is an admin/agent in this workspace, ensure they are present in the list
+        if (sessionUser && (sessionUser.workspace_id === targetWorkspaceId || !targetWorkspaceId)) {
+          const hasCaller = members.some(
+            (m) => m.id === sessionUser.id || m.email.toLowerCase() === sessionUser.email.toLowerCase()
+          );
+          if (!hasCaller && sessionUser.role !== "customer") {
+            members.unshift({
+              id: sessionUser.id,
+              email: sessionUser.email,
+              fullName: sessionUser.name,
+              role: sessionUser.role === "admin" ? "admin" : "agent",
+              workspaceId: targetWorkspaceId,
+              avatarUrl: sessionUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${sessionUser.email}`,
+              isActive: true,
+              createdAt: new Date().toISOString(),
+            });
+          }
+        }
+
+        return members;
       }
     } catch (err) {
       console.warn("Failed to fetch team members from Supabase:", err);

@@ -1,9 +1,11 @@
 import { redirect } from "next/navigation";
 import { getCurrentSessionUser } from "@/app/actions/auth";
 import { getAgentTickets } from "@/app/actions/tickets";
+import { getTeamMembers } from "@/app/actions/team";
 import { AgentDeskClient } from "@/components/desk/AgentDeskClient";
 import { DeskHeader } from "@/components/desk/DeskHeader";
 import { EmptyTicketsState } from "@/components/desk/EmptyTicketsState";
+import { User } from "@/types/desk";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +20,21 @@ export default async function AgentPage() {
     redirect("/portal");
   }
 
-  const tickets = await getAgentTickets(currentUser.workspace_id);
+  const [tickets, teamMembers] = await Promise.all([
+    getAgentTickets(currentUser.workspace_id),
+    getTeamMembers(currentUser.workspace_id),
+  ]);
+
+  const availableAgents: User[] = teamMembers.map((m) => ({
+    id: m.id,
+    name: m.fullName,
+    email: m.email,
+    avatar: m.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.email}`,
+    role: m.role,
+    workspaceId: m.workspaceId,
+    workspace_id: m.workspaceId,
+    isActive: m.isActive,
+  }));
 
   if (tickets.length === 0) {
     return (
@@ -31,5 +47,11 @@ export default async function AgentPage() {
     );
   }
 
-  return <AgentDeskClient initialTickets={tickets} currentUser={currentUser} />;
+  return (
+    <AgentDeskClient
+      initialTickets={tickets}
+      currentUser={currentUser}
+      availableAgents={availableAgents}
+    />
+  );
 }
