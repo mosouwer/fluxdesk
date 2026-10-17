@@ -36,10 +36,12 @@ export function CommandMenu() {
 
     window.addEventListener("keydown", down);
     window.addEventListener("fluxdesk:open-command-menu", handleCustomOpen);
+    window.addEventListener("mellowdesk:open-command-menu", handleCustomOpen);
 
     return () => {
       window.removeEventListener("keydown", down);
       window.removeEventListener("fluxdesk:open-command-menu", handleCustomOpen);
+      window.removeEventListener("mellowdesk:open-command-menu", handleCustomOpen);
     };
   }, []);
 

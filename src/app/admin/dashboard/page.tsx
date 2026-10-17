@@ -32,6 +32,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
+import { CommandMenuTrigger } from "@/components/CommandMenuTrigger";
 
 export const dynamic = "force-dynamic";
 
@@ -210,21 +211,31 @@ export default async function AdminDashboardPage() {
   } else {
     tickets = await getAgentTickets(adminWorkspaceId || workspace.id);
   }
-  const teamMembers = await getTeamMembers(workspace.id);
+  if (!tickets || tickets.length === 0) {
+    try {
+      tickets = await getAgentTickets(adminWorkspaceId || workspace.id);
+    } catch {
+      tickets = [];
+    }
+  }
+
+  const teamMembers = await getTeamMembers(adminWorkspaceId || workspace.id);
 
   // Combine team members with available mock agents to ensure all agents are reflected
   const combinedAgentsMap = new Map();
-  teamMembers.forEach((m) => {
-    combinedAgentsMap.set(m.email.toLowerCase(), {
-      id: m.id,
-      name: m.fullName,
-      email: m.email,
-      role: m.role,
-      avatar: m.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.email}`,
-    });
+  (teamMembers || []).forEach((m) => {
+    if (m && m.email) {
+      combinedAgentsMap.set(m.email.toLowerCase(), {
+        id: m.id,
+        name: m.fullName || m.email.split("@")[0],
+        email: m.email,
+        role: m.role || "agent",
+        avatar: m.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${m.email}`,
+      });
+    }
   });
   AVAILABLE_AGENTS.forEach((a) => {
-    if (!combinedAgentsMap.has(a.email.toLowerCase())) {
+    if (a && a.email && !combinedAgentsMap.has(a.email.toLowerCase())) {
       combinedAgentsMap.set(a.email.toLowerCase(), a);
     }
   });
@@ -260,8 +271,8 @@ export default async function AdminDashboardPage() {
   const agentWorkloadStats = allAgents.map((agent) => {
     const assignedTickets = tickets.filter(
       (t) =>
-        t.assignedAgent?.id === agent.id ||
-        t.assignedAgent?.email?.toLowerCase() === agent.email?.toLowerCase()
+        (agent.id && t.assignedAgent?.id === agent.id) ||
+        (agent.email && t.assignedAgent?.email?.toLowerCase() === agent.email.toLowerCase())
     );
     const count = assignedTickets.length;
     const sharePercent =
@@ -307,15 +318,7 @@ export default async function AdminDashboardPage() {
           </div>
 
           <div className="flex items-center gap-2.5">
-            <button
-              type="button"
-              onClick={() => window.dispatchEvent(new CustomEvent("fluxdesk:open-command-menu"))}
-              className="hidden md:inline-flex items-center gap-2 h-7.5 px-2.5 rounded-md text-xs font-medium bg-zinc-100 hover:bg-zinc-200/70 border border-zinc-200/80 text-zinc-500 hover:text-zinc-900 transition-colors shadow-2xs cursor-pointer"
-            >
-              <Search className="h-3.5 w-3.5 text-zinc-400" />
-              <span>Search or jump to...</span>
-              <kbd className="px-1.5 py-0.2 text-[10px] bg-white border border-zinc-200 rounded text-zinc-400 font-mono">⌘K</kbd>
-            </button>
+            <CommandMenuTrigger />
 
             <Link
               href="/"
@@ -502,18 +505,19 @@ export default async function AdminDashboardPage() {
                 </thead>
                 <tbody className="divide-y divide-zinc-100 text-xs">
                   {agentWorkloadStats.map(({ agent, count, sharePercent, openCount, resolvedCount }) => {
-                    const initials = agent.name
-                      ? agent.name
-                          .split(" ")
-                          .map((n: string) => n[0])
-                          .join("")
-                          .slice(0, 2)
-                          .toUpperCase()
-                      : "A";
+                    const agentName = agent.name || agent.email?.split("@")[0] || "Agent";
+                    const initials =
+                      agentName
+                        .split(" ")
+                        .map((n: string) => n[0])
+                        .filter(Boolean)
+                        .join("")
+                        .slice(0, 2)
+                        .toUpperCase() || "A";
 
                     return (
                       <tr
-                        key={agent.email}
+                        key={agent.email || agent.id}
                         className="h-11 hover:bg-zinc-50/70 transition-colors border-b border-zinc-100 last:border-0"
                       >
                         {/* Agent Name & Avatar */}

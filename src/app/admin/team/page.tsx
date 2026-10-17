@@ -21,6 +21,7 @@ import { getTeamMembers } from "@/app/actions/team";
 import { logoutUser } from "@/app/actions/auth";
 import { TeamMember } from "@/data/teamStore";
 import { CreateAgentModal } from "@/components/admin/CreateAgentModal";
+import { CommandMenuTrigger } from "@/components/CommandMenuTrigger";
 
 export default function AdminTeamPage() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -83,15 +84,7 @@ export default function AdminTeamPage() {
           </div>
 
           <div className="flex items-center gap-2.5">
-            <button
-              type="button"
-              onClick={() => window.dispatchEvent(new CustomEvent("fluxdesk:open-command-menu"))}
-              className="hidden md:inline-flex items-center gap-2 h-7.5 px-2.5 rounded-md text-xs font-medium bg-zinc-100 hover:bg-zinc-200/70 border border-zinc-200/80 text-zinc-500 hover:text-zinc-900 transition-colors shadow-2xs cursor-pointer"
-            >
-              <Search className="h-3.5 w-3.5 text-zinc-400" />
-              <span>Search or jump to...</span>
-              <kbd className="px-1.5 py-0.2 text-[10px] bg-white border border-zinc-200 rounded text-zinc-400 font-mono">⌘K</kbd>
-            </button>
+            <CommandMenuTrigger />
 
             <Link
               href="/admin/dashboard"

@@ -760,6 +760,9 @@ export async function getAgentTickets(workspaceId?: string): Promise<Ticket[]> {
           createdAt: new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         })),
         workspaceId: t.workspace_id,
+        csatRating: t.csat_rating,
+        csatFeedback: t.csat_feedback,
+        ratedAt: t.rated_at,
       }));
     }
 
